@@ -3,13 +3,17 @@ package com.example.enac_project.controller;
 import com.example.enac_project.model.Aircraft;
 import com.example.enac_project.model.CameraModel;
 import com.example.enac_project.vue.MainView;
+import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.input.KeyCode;
 
 public class SceneController {
     private MainView mainView;
     private Aircraft aircraft;
     private CameraModel cameraModel;
-    private double airplaneX = 0, airplaneY = -20, airplaneZ = 0;
+    private Service<Void> aircraftSimulationService;
+    private boolean stopSimulation = false;
 
     public SceneController(MainView mainView, Aircraft aircraft, CameraModel cameraModel) {
         this.mainView = mainView;
@@ -19,6 +23,7 @@ public class SceneController {
 
         mainView.bindAircraft(aircraft);
         mainView.bindCamera(cameraModel);
+        startAircraftSimulation();
     }
 
     private void setupCameraControl() {
@@ -45,6 +50,36 @@ public class SceneController {
             cameraModel.setY(cameraModel.getY() + deltaY);
             cameraModel.setZ(cameraModel.getZ() + deltaZ);
         });
+    }
+
+    private void startAircraftSimulation() {
+        aircraftSimulationService = new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        while (!stopSimulation) {
+                            double newZ = aircraft.getZ() + aircraft.getSpeed();
+                            Platform.runLater(() -> {
+                                aircraft.setZ(newZ);
+                                cameraModel.setZ(newZ);
+                            });
+                            Thread.sleep(100);
+                        }
+                        return null;
+                    }
+                };
+            }
+        };
+        aircraftSimulationService.start();
+    }
+
+    public void stopSimulation() {
+        stopSimulation = true;
+        if (aircraftSimulationService != null) {
+            aircraftSimulationService.cancel();
+        }
     }
 
 }
