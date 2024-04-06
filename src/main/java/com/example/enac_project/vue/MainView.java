@@ -2,7 +2,7 @@ package com.example.enac_project.vue;
 
 import com.example.enac_project.model.Aircraft;
 import com.example.enac_project.model.CameraModel;
-import com.example.enac_project.model.Runway;
+import com.example.enac_project.model.RunwayView;
 import javafx.beans.binding.Bindings;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
@@ -22,21 +22,21 @@ public class MainView {
     private final Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
     private PerspectiveCamera camera = new PerspectiveCamera(true);
     private Box airplane = new Box(30, 10, 10);
-    private Box runway = new Box(300, 5, 1000);
+    private RunwayView runwayView;
 
     private Label airplanePositionLabel = new Label();
     private Label runwayPositionLabel = new Label();
 
-    public MainView(Aircraft aircraft, Runway runwayModel, CameraModel cameraModel) {
+    public MainView(Aircraft aircraft, CameraModel cameraModel) {
+        runwayView = new RunwayView();
+
         bindAircraft(aircraft);
         bindCamera(cameraModel);
-        bindRunway(runwayModel);
         initialize();
     }
 
     private void initialize() {
         airplane.setMaterial(new PhongMaterial(Color.YELLOW));
-        runway.setMaterial(new PhongMaterial(Color.BLACK));
 
         // Configuration de la caméra
         camera.getTransforms().addAll(new Translate(0, 0, -1000));
@@ -48,7 +48,7 @@ public class MainView {
         labelsBox.setTranslateX(20);
         labelsBox.setTranslateY(20);
 
-        root.getChildren().addAll(airplane, runway);
+        root.getChildren().addAll(airplane, runwayView);
         SubScene subScene = new SubScene(root, 800, 600, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.LIGHTBLUE);
         subScene.setCamera(camera);
@@ -72,17 +72,6 @@ public class MainView {
         camera.translateYProperty().bind(cameraModel.yProperty());
         camera.translateZProperty().bind(cameraModel.zProperty());
     }
-
-    public void bindRunway(Runway runwayModel) {
-        runway.translateXProperty().bind(runwayModel.xProperty());
-        runway.translateYProperty().bind(runwayModel.yProperty());
-        runway.translateZProperty().bind(runwayModel.zProperty());
-
-        runwayPositionLabel.textProperty().bind(Bindings.createStringBinding(() ->
-                        String.format("Piste: X=%.2f Y=%.2f Z=%.2f", runwayModel.getX(), runwayModel.getY(), runwayModel.getZ()),
-                runwayModel.xProperty(), runwayModel.yProperty(), runwayModel.zProperty()));
-    }
-
 
     public Scene getScene() {
         return this.scene;

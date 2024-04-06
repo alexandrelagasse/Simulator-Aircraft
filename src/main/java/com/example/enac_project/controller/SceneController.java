@@ -2,30 +2,23 @@ package com.example.enac_project.controller;
 
 import com.example.enac_project.model.Aircraft;
 import com.example.enac_project.model.CameraModel;
-import com.example.enac_project.model.Runway;
 import com.example.enac_project.vue.MainView;
-import javafx.scene.Camera;
-import javafx.scene.SubScene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.transform.Translate;
 
 public class SceneController {
     private MainView mainView;
     private Aircraft aircraft;
     private CameraModel cameraModel;
-    private Runway runway;
     private double airplaneX = 0, airplaneY = -20, airplaneZ = 0;
 
-    public SceneController(MainView mainView, Aircraft aircraft, Runway runway, CameraModel cameraModel) {
+    public SceneController(MainView mainView, Aircraft aircraft, CameraModel cameraModel) {
         this.mainView = mainView;
         this.aircraft = aircraft;
-        this.runway = runway;
         this.cameraModel = cameraModel;
         setupCameraControl();
 
         mainView.bindAircraft(aircraft);
         mainView.bindCamera(cameraModel);
-        mainView.bindRunway(runway);
     }
 
     private void setupCameraControl() {
