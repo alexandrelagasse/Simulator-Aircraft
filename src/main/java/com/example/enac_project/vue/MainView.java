@@ -1,13 +1,10 @@
 package com.example.enac_project.vue;
 
 import com.example.enac_project.model.Aircraft;
-import com.example.enac_project.model.CameraModel;
 import com.example.enac_project.model.RunwayView;
 import javafx.beans.binding.Bindings;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.scene.control.Label;
@@ -21,25 +18,23 @@ public class MainView {
     private final Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
     private final Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
     private PerspectiveCamera camera = new PerspectiveCamera(true);
-    private Box airplane = new Box(30, 10, 10);
     private RunwayView runwayView;
 
     private Label airplanePositionLabel = new Label();
     private Label runwayPositionLabel = new Label();
 
-    public MainView(Aircraft aircraft, CameraModel cameraModel) {
+    public MainView(Aircraft aircraft) {
         runwayView = new RunwayView();
 
         bindAircraft(aircraft);
-        bindCamera(cameraModel);
-        initialize();
+
+        initialize(new Translate(aircraft.getX(), aircraft.getY(), aircraft.getZ()));
     }
 
-    private void initialize() {
-        airplane.setMaterial(new PhongMaterial(Color.YELLOW));
+    private void initialize(Translate positionCamera) {
 
         // Configuration de la caméra
-        camera.getTransforms().addAll(new Translate(0, 0, -1000));
+        camera.getTransforms().addAll(positionCamera);
         camera.setNearClip(1);
         camera.setFarClip(2000);
         camera.setFieldOfView(60);
@@ -48,7 +43,7 @@ public class MainView {
         labelsBox.setTranslateX(20);
         labelsBox.setTranslateY(20);
 
-        root.getChildren().addAll(airplane, runwayView);
+        root.getChildren().addAll(runwayView);
         SubScene subScene = new SubScene(root, 800, 600, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.LIGHTBLUE);
         subScene.setCamera(camera);
@@ -58,19 +53,13 @@ public class MainView {
     }
 
     public void bindAircraft(Aircraft aircraft) {
-        airplane.translateXProperty().bind(aircraft.xProperty());
-        airplane.translateYProperty().bind(aircraft.yProperty());
-        airplane.translateZProperty().bind(aircraft.zProperty());
+        camera.translateXProperty().bind(aircraft.xProperty());
+        camera.translateYProperty().bind(aircraft.yProperty());
+        camera.translateZProperty().bind(aircraft.zProperty());
 
         airplanePositionLabel.textProperty().bind(Bindings.createStringBinding(() ->
                         String.format("Avion: X=%.2f Y=%.2f Z=%.2f", aircraft.getX(), aircraft.getY(), aircraft.getZ()),
                 aircraft.xProperty(), aircraft.yProperty(), aircraft.zProperty()));
-    }
-
-    public void bindCamera(CameraModel cameraModel) {
-        camera.translateXProperty().bind(cameraModel.xProperty());
-        camera.translateYProperty().bind(cameraModel.yProperty());
-        camera.translateZProperty().bind(cameraModel.zProperty());
     }
 
     public Scene getScene() {

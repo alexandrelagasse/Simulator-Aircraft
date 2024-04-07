@@ -26,4 +26,11 @@ public class Point3DCustom {
     public double getZ() { return z.get(); }
     public void setZ(double value) { z.set(value); }
     public DoubleProperty zProperty() { return z; }
+
+    public double distance(Point3DCustom other) {
+        double dx = this.getX() - other.getX();
+        double dy = this.getY() - other.getY();
+        double dz = this.getZ() - other.getZ();
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
 }

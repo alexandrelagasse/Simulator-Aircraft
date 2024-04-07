@@ -13,7 +13,6 @@ public class RunwayView extends Group {
     public RunwayView() {
         super();
         placerLumiere();
-        tracerRepere();
         dessinerPiste();
     }
 

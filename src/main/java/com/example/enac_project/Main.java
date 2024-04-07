@@ -2,7 +2,6 @@ package com.example.enac_project;
 
 import com.example.enac_project.controller.SceneController;
 import com.example.enac_project.model.Aircraft;
-import com.example.enac_project.model.CameraModel;
 import com.example.enac_project.vue.MainView;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
@@ -20,10 +19,9 @@ public class Main extends Application {
             return;
         }
 
-        Aircraft aircraft = new Aircraft();
-        CameraModel cameraModel = new CameraModel();
-        MainView mainView = new MainView(aircraft, cameraModel);
-        SceneController sceneController = new SceneController(mainView, aircraft, cameraModel);
+        Aircraft aircraft = new Aircraft(0,-200,-1500, 30);
+        MainView mainView = new MainView(aircraft);
+        SceneController sceneController = new SceneController(mainView, aircraft);
 
         primaryStage.setScene(mainView.getScene());
         primaryStage.setTitle("Simulateur d'Atterrissage");
