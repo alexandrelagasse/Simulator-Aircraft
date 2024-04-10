@@ -2,6 +2,7 @@ package com.example.enac_project;
 
 import com.example.enac_project.controller.SceneController;
 import com.example.enac_project.model.Aircraft;
+import com.example.enac_project.model.SimulationController;
 import com.example.enac_project.vue.MainView;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
@@ -19,7 +20,8 @@ public class Main extends Application {
             return;
         }
 
-        Aircraft aircraft = new Aircraft(0,-200,-1500, 30);
+        SimulationController simulationController = new SimulationController();
+        Aircraft aircraft = simulationController.getAircraft();
         MainView mainView = new MainView(aircraft);
         SceneController sceneController = new SceneController(mainView, aircraft);
 

@@ -7,9 +7,12 @@ public class Localizer {
         this.seuilPiste = seuilPiste;
     }
 
-    public double calculerAngleLOC(Point3DCustom point) {
-        double angleRadLOC = Math.atan2(point.getY() - seuilPiste.getY(), point.getX() - seuilPiste.getX());
-        double angleLOC = Math.toDegrees(angleRadLOC);
-        return angleLOC;
+    public double calculerAngleLOC(Point3DCustom positionAvion) {
+        // Calculer la déviation de l'axe Z
+        double dx = positionAvion.getX() - seuilPiste.getX();
+        double dz = positionAvion.getZ() - seuilPiste.getZ();
+        // Angle par rapport à l'axe Z
+        double angleRadLOC = Math.atan2(dx, dz);
+        return Math.toDegrees(angleRadLOC);
     }
 }

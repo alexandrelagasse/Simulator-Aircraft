@@ -9,6 +9,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 
 
 
@@ -47,8 +48,24 @@ public class MainView {
         SubScene subScene = new SubScene(root, 800, 600, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.LIGHTBLUE);
         subScene.setCamera(camera);
+        ILSIndicator indicator = new ILSIndicator();
 
-        Group mainRoot = new Group(subScene, labelsBox);
+
+// Positionner et dimensionner le fond de l'indicateur pour améliorer la visibilité
+        Rectangle indicatorBackground = new Rectangle(200, 200, Color.DARKGRAY); // Ajuster les dimensions si nécessaire
+        indicator.setTranslateX(300 - indicatorBackground.getWidth() / 2); // Ajustez en fonction de la position souhaitée
+        indicator.setTranslateY(150 - indicatorBackground.getHeight() / 2);
+        indicatorBackground.setArcWidth(30); // Pour les coins arrondis
+        indicatorBackground.setArcHeight(30);
+        indicator.setTranslateX(300); // Centre de la scène par exemple
+        indicator.setTranslateY(150);
+
+// Positionner l'indicateur au-dessus du fond
+        indicator.setTranslateX(indicatorBackground.getX() + indicatorBackground.getWidth() / 2);
+        indicator.setTranslateY(indicatorBackground.getY() + indicatorBackground.getHeight() / 2);
+
+
+        Group mainRoot = new Group(subScene, labelsBox, indicator);
         this.scene = new Scene(mainRoot, 800, 600);
     }
 
