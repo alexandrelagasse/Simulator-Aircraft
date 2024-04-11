@@ -2,6 +2,7 @@ package com.example.enac_project;
 
 import com.example.enac_project.controller.SceneController;
 import com.example.enac_project.model.Aircraft;
+import com.example.enac_project.model.Point3DCustom;
 import com.example.enac_project.model.SimulationController;
 import com.example.enac_project.vue.MainView;
 import javafx.application.Application;
@@ -22,7 +23,8 @@ public class Main extends Application {
 
         SimulationController simulationController = new SimulationController();
         Aircraft aircraft = simulationController.getAircraft();
-        MainView mainView = new MainView(aircraft);
+        Point3DCustom runwayPoint = simulationController.getRunwayPoint();
+        MainView mainView = new MainView(aircraft, runwayPoint);
         SceneController sceneController = new SceneController(mainView, aircraft);
 
         primaryStage.setScene(mainView.getScene());

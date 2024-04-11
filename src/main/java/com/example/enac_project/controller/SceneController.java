@@ -1,11 +1,16 @@
 package com.example.enac_project.controller;
 
 import com.example.enac_project.model.Aircraft;
+import com.example.enac_project.model.ILS;
+import com.example.enac_project.model.Point3DCustom;
+import com.example.enac_project.model.RunwayView;
+import com.example.enac_project.vue.ILSIndicator;
 import com.example.enac_project.vue.MainView;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.input.KeyCode;
+import javafx.scene.shape.Box;
 
 public class SceneController {
     private MainView mainView;
@@ -42,6 +47,7 @@ public class SceneController {
             aircraft.setX(aircraft.getX() + deltaX);
             aircraft.setY(aircraft.getY() + deltaY);
             aircraft.setZ(aircraft.getZ() + deltaZ);
+            updateILSIndicator();
         });
     }
 
@@ -55,6 +61,7 @@ public class SceneController {
                         while (!stopSimulation) {
                             Platform.runLater(() -> {
                                 aircraft.updatePosition();
+                                updateILSIndicator();
                             });
                             Thread.sleep(100);
                         }
@@ -65,6 +72,20 @@ public class SceneController {
         };
         aircraftSimulationService.start();
     }
+
+    public void updateILSIndicator() {
+
+        ILS ils = aircraft.getILS();
+        Point3DCustom posAircraft = new Point3DCustom(aircraft.getX(), aircraft.getY(), aircraft.getZ());
+        double deviationLocalizer = ils.calculateLocalizerBar(posAircraft);
+        double deviationGlidePath = ils.calculateGlidePathBar(posAircraft);
+
+        ILSIndicator indicator = mainView.getIndicator();
+        indicator.adjustGlidePathBars(deviationGlidePath);
+        indicator.moveLocalizerBar(deviationLocalizer);
+
+    }
+
 
     public void stopSimulation() {
         stopSimulation = true;

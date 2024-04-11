@@ -10,14 +10,20 @@ import javafx.scene.PointLight;
 import javafx.scene.shape.Sphere;
 
 public class RunwayView extends Group {
-    public RunwayView() {
+
+    private Box piste;
+
+    public RunwayView(Point3DCustom runwayPoint) {
         super();
         placerLumiere();
-        dessinerPiste();
+        dessinerPiste(runwayPoint);
     }
 
-    private void dessinerPiste() {
-        Box piste = new Box(400, 2, 2500);
+    private void dessinerPiste(Point3DCustom runwayPoint) {
+        piste = new Box(400, 2, 2500);
+        piste.setTranslateX(runwayPoint.getX());
+        piste.setTranslateY(runwayPoint.getY());
+        piste.setTranslateZ(runwayPoint.getZ());
         piste.setCullFace(CullFace.BACK);
         piste.setDrawMode(DrawMode.FILL);
         piste.setMaterial(new PhongMaterial(Color.BLUE));
@@ -55,4 +61,7 @@ public class RunwayView extends Group {
         axeZ.setMaterial(new PhongMaterial(Color.GREEN));
         this.getChildren().add(axeZ);
     }
+
+    public Box getPiste() {return piste;}
+
 }
