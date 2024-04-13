@@ -3,7 +3,6 @@ package com.example.enac_project;
 import com.example.enac_project.controller.SceneController;
 import com.example.enac_project.model.Aircraft;
 import com.example.enac_project.model.Point3DCustom;
-import com.example.enac_project.model.SimulationController;
 import com.example.enac_project.vue.MainView;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
@@ -21,11 +20,13 @@ public class Main extends Application {
             return;
         }
 
-        SimulationController simulationController = new SimulationController();
-        Aircraft aircraft = simulationController.getAircraft();
-        Point3DCustom runwayPoint = simulationController.getRunwayPoint();
+        Point3DCustom runwayPoint = new Point3DCustom(0, 0, -1250);
+
+        // Créer l'instance de l'avion avec une position initiale et une vitesse
+        Aircraft aircraft = new Aircraft(runwayPoint);
+
         MainView mainView = new MainView(aircraft, runwayPoint);
-        SceneController sceneController = new SceneController(mainView, aircraft);
+        SceneController sceneController = new SceneController(mainView, aircraft, mainView.getCameraManager());
 
         primaryStage.setScene(mainView.getScene());
         primaryStage.setTitle("Simulateur d'Atterrissage");

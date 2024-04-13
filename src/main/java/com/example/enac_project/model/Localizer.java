@@ -4,7 +4,8 @@ public class Localizer {
     private Point3DCustom seuilPiste;
 
     public Localizer(Point3DCustom seuilPiste) {
-        this.seuilPiste = seuilPiste;
+
+        this.seuilPiste = new Point3DCustom(seuilPiste.getX(), seuilPiste.getY(), seuilPiste.getZ() - 1250);
     }
 
     public double calculerAngleLOC(Point3DCustom positionAvion) {

@@ -1,52 +1,79 @@
 package com.example.enac_project.controller;
 
-import com.example.enac_project.model.Aircraft;
-import com.example.enac_project.model.ILS;
-import com.example.enac_project.model.Point3DCustom;
-import com.example.enac_project.model.RunwayView;
+import com.example.enac_project.model.*;
+import com.example.enac_project.vue.CameraManager;
 import com.example.enac_project.vue.ILSIndicator;
 import com.example.enac_project.vue.MainView;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.input.KeyCode;
-import javafx.scene.shape.Box;
 
 public class SceneController {
     private MainView mainView;
-    private Aircraft aircraft;
     private Service<Void> aircraftSimulationService;
+    private Aircraft aircraft;
     private boolean stopSimulation = false;
+    private CameraManager cameraManager;
 
-    public SceneController(MainView mainView, Aircraft aircraft) {
+    public SceneController(MainView mainView, Aircraft aircraft, CameraManager cameraManager) {
         this.mainView = mainView;
+        this.cameraManager = cameraManager;
         this.aircraft = aircraft;
 
-        setupCameraControl();
+        setupAircraftControl();
         startAircraftSimulation();
     }
 
-    private void setupCameraControl() {
-        mainView.getScene().setOnKeyPressed(event -> {
-            double deltaX = 0, deltaY = 0, deltaZ = 0;
+    private void setupControls() {
+        // Associer les boutons de la vue avec des méthodes du contrôleur
+        mainView.getStartButton().setOnAction(e -> startAircraftSimulation());
+        mainView.getStopButton().setOnAction(e -> stopSimulation());
+        mainView.getResetButton().setOnAction(e -> resetSimulation());
+    }
 
-            if (event.getCode() == KeyCode.UP) {
-                deltaY = 10;
-            } else if (event.getCode() == KeyCode.DOWN) {
-                deltaY = -10;
-            } else if (event.getCode() == KeyCode.RIGHT) {
-                deltaX = 10;
-            } else if (event.getCode() == KeyCode.LEFT) {
-                deltaX = -10;
-            } else if (event.getCode() == KeyCode.Z) {
-                deltaZ = 10;
-            } else if (event.getCode() == KeyCode.S) {
-                deltaZ = -10;
+    private void setupAircraftControl() {
+        mainView.getScene().setOnKeyPressed(event -> {
+            double yaw = 0;   // Lacet : rotation autour de l'axe Y
+            double pitch = 0; // Tangage : rotation autour de l'axe X
+            double roll = 0;  // Roulis : rotation autour de l'axe Z
+
+            if (!stopSimulation) {
+                switch (event.getCode()) {
+                    case LEFT:    // Lacet gauche
+                        yaw = -1;
+                        break;
+                    case RIGHT:   // Lacet droit
+                        yaw = 1;
+                        break;
+                    case UP:      // Tangage haut
+                        pitch = 1;
+                        break;
+                    case DOWN:    // Tangage bas
+                        pitch = -1;
+                        break;
+                    case Q:       // Roulis gauche
+                        roll = -1;
+                        break;
+                    case D:       // Roulis droit
+                        roll = 1;
+                        break;
+                    case ENTER:
+                        resetSimulation();
+                        break;
+                    default:
+                        // Gérer les autres touches si nécessaire
+                        break;
+                }
             }
 
-            aircraft.setX(aircraft.getX() + deltaX);
-            aircraft.setY(aircraft.getY() + deltaY);
-            aircraft.setZ(aircraft.getZ() + deltaZ);
+            // Appliquer les changements à l'orientation de l'avion
+            aircraft.setYaw(aircraft.getYaw() + yaw);
+            aircraft.setPitch(aircraft.getPitch() + pitch);
+            aircraft.setRoll(aircraft.getRoll() + roll);
+
+            cameraManager.updateOrientation(aircraft.getYaw(), aircraft.getPitch(), aircraft.getRoll());
+
+            // Mettre à jour l'indicateur ILS après le changement d'orientation
             updateILSIndicator();
         });
     }
@@ -71,6 +98,7 @@ public class SceneController {
             }
         };
         aircraftSimulationService.start();
+        stopSimulation = false;
     }
 
     public void updateILSIndicator() {
@@ -92,6 +120,12 @@ public class SceneController {
         if (aircraftSimulationService != null) {
             aircraftSimulationService.cancel();
         }
+    }
+
+    public void resetSimulation () {
+        stopSimulation = false;
+        aircraft.reset();
+        mainView.resetCamera();
     }
 
 }

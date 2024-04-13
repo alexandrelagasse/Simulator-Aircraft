@@ -17,9 +17,8 @@ public class ILSIndicator extends Group {
     private Rectangle indicatorBackground; // The indicator's background
     private Circle centerCircle; // The circle in the center
     private Circle centerDot; // The center aiming dot
-    private Rectangle localizerBar; // Le carré noir pour le localizer
-    private Line glidePathHorizBar; // La barre supérieure du glide path
-    private Line glidePathVertiBar; // La barre inférieure du glide path
+    private Line localizerHorizBar; // La barre supérieure du glide path
+    private Line glidePathBar; // La barre inférieure du glide path
     private Line verticalAxis;
     private Line horizontalAxis;
     double offsetForCenteringX = 0.0;
@@ -32,10 +31,10 @@ public class ILSIndicator extends Group {
         initAxes();
         initCenterCircle();
         initCenterDot();
-        initLocalizerBar();
-        initGlidePathBars();
+        initGlidePathBar();
+        initLocalizerHoriBar();
 
-        this.getChildren().addAll(indicatorBackground, centerCircle, verticalAxis, horizontalAxis,centerDot,  glidePathHorizBar, glidePathVertiBar, localizerBar);
+        this.getChildren().addAll(indicatorBackground, centerCircle, verticalAxis, horizontalAxis,centerDot,  localizerHorizBar, glidePathBar);
     }
 
     private void initIndicatorBackground(Point3DCustom pos) {
@@ -74,24 +73,22 @@ public class ILSIndicator extends Group {
         centerDot.setTranslateY(offsetForCenteringY);
     }
 
-    private void initLocalizerBar() {
-        localizerBar = new Rectangle(0, -20, 20, 10);
-        localizerBar.setFill(null);
-        localizerBar.setStroke(Color.BLACK);
-        localizerBar.setTranslateX(offsetForCenteringX - localizerBar.getWidth() / 2);
-        localizerBar.setTranslateY(offsetForCenteringY - localizerBar.getHeight() / 2);
+    private void initLocalizerHoriBar() {
+        localizerHorizBar = new Line(0, 0, 50, 0);
+        localizerHorizBar.setStroke(Color.WHITE);
+        localizerHorizBar.setStrokeWidth(2);
+        localizerHorizBar.setTranslateX(offsetForCenteringX - 25); // Centre - demi-longueur
+        localizerHorizBar.setTranslateY(offsetForCenteringY); // Centre
     }
 
-    private void initGlidePathBars() {
-        // La barre horizontale doit s'étendre de gauche à droite à partir du centre.
-        glidePathHorizBar = new Line(offsetForCenteringX - 25, offsetForCenteringY, offsetForCenteringX + 25, offsetForCenteringY);
-        glidePathHorizBar.setStroke(Color.WHITE);
-        glidePathHorizBar.setStrokeWidth(2);
+    private void initGlidePathBar() {
 
         // La barre verticale doit s'étendre de haut en bas à partir du centre.
-        glidePathVertiBar = new Line(offsetForCenteringX, offsetForCenteringY -  25, offsetForCenteringX, offsetForCenteringY + 25);
-        glidePathVertiBar.setStroke(Color.WHITE);
-        glidePathVertiBar.setStrokeWidth(2);
+        glidePathBar = new Line(0, 0, 0, 50);
+        glidePathBar.setStroke(Color.WHITE);
+        glidePathBar.setStrokeWidth(2);
+        glidePathBar.setTranslateX(offsetForCenteringX); // Centre
+        glidePathBar.setTranslateY(offsetForCenteringY - 25); // Centre - demi-longueur
     }
 
     private Line createDashedLine(double length, boolean isHorizontal) {
@@ -109,17 +106,14 @@ public class ILSIndicator extends Group {
     }
 
     public void adjustGlidePathBars(double deviation) {
-        // Déplacer la barre horizontale
 
-        glidePathHorizBar.setTranslateY(offsetForCenteringY + deviation);
+        glidePathBar.setTranslateY(offsetForCenteringY - localizerHorizBar.getLayoutBounds().getWidth() / 2 + deviation);
 
-        // Déplacer la barre verticale
-        glidePathVertiBar.setTranslateX(offsetForCenteringX + deviation);
     }
 
     public void moveLocalizerBar(double deviation) {
         // Déplacer le localizer bar horizontalement selon la déviation
-        localizerBar.setTranslateX(offsetForCenteringX + deviation - localizerBar.getWidth() / 2);
+        localizerHorizBar.setTranslateX(offsetForCenteringX - glidePathBar.getLayoutBounds().getHeight() / 2 + deviation);
     }
 
 

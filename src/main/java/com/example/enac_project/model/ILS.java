@@ -5,10 +5,9 @@ public class ILS {
     private GlidePath glidePath;
     private Localizer localizer;
     private Markers markers;
-    double degreesPerPixel = 10.0 / 45.0;  // 10 degrés pour 45 pixels
 
-    public ILS(RunwayPoint point) {
-        glidePath = new GlidePath();
+    public ILS(Point3DCustom point) {
+        glidePath = new GlidePath(point);
         localizer = new Localizer(point);
         double rayonDetection = 500;
         markers = new Markers(
@@ -32,19 +31,21 @@ public class ILS {
 
     public double calculateLocalizerBar(Point3DCustom point) {
         double angleLOC = localizer.calculerAngleLOC(point);
+        double degreesPerPixel = 4.5; // 45 pixels pour 10 degrés
 
-        double displacement = angleLOC / degreesPerPixel;
-        // Limiter le déplacement pour rester dans le cercle
-        displacement = Math.min(Math.max(displacement, -45), 45); // -45 à 45 pixels
+        double displacement = angleLOC * degreesPerPixel;
+        // Limiter le déplacement à la moitié de l'indicateur pour que les barres ne dépassent pas
+        displacement = Math.min(Math.max(displacement, -22.5), 22.5); // -22.5 à 22.5 pixels
         return displacement;
     }
 
     public double calculateGlidePathBar(Point3DCustom point) {
         double angleGP = glidePath.calculerAngleGP(point);
+        double degreesPerPixel = 4.5; // 45 pixels pour 10 degrés
 
-        double displacement = angleGP / degreesPerPixel;
-        // Limiter le déplacement pour rester dans le cercle
-        displacement = Math.min(Math.max(displacement, -45), 45); // -45 à 45 pixels
+        double displacement = angleGP * degreesPerPixel;
+        // Limiter le déplacement à la moitié de l'indicateur pour que les barres ne dépassent pas
+        displacement = Math.min(Math.max(displacement, -22.5), 22.5); // -22.5 à 22.5 pixels
         return displacement;
     }
 }
