@@ -5,16 +5,13 @@ import com.example.enac_project.model.Point3DCustom;
 import com.example.enac_project.model.RunwayView;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Translate;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
-
 
 
 public class MainView {
@@ -31,7 +28,7 @@ public class MainView {
 
     private Label airplanePositionLabel = new Label();
     private Label runwayPositionLabel = new Label();
-    private VBox controls;
+    private HBox controls;
 
     public MainView(Aircraft aircraft, Point3DCustom runwayPoint) {
         cameraManager = new CameraManager();
@@ -39,9 +36,7 @@ public class MainView {
         indicator = new ILSIndicator(new Point3DCustom(200,200, 0));
 
         bindAircraft(aircraft);
-
-        setupControls();
-        initialize(new Translate(aircraft.getX(), aircraft.getY(), aircraft.getZ()));
+        initialize();
     }
 
     public Button getStartButton() {
@@ -56,36 +51,57 @@ public class MainView {
         return resetButton;
     }
 
-    private void setupControls() {
-        controls = new VBox(5, startButton, stopButton, resetButton);
-        controls.setTranslateX(20);
-        controls.setTranslateY(20);
+
+    private SubScene createCameraView() {
+        Group cameraViewRoot = new Group();
+        cameraViewRoot.getChildren().add(runwayView);
+        SubScene cameraView = new SubScene(cameraViewRoot, 800, 600, true, SceneAntialiasing.BALANCED);
+        cameraView.setFill(Color.LIGHTBLUE);
+        cameraView.setCamera(cameraManager.getCamera());
+        return cameraView;
     }
 
-    private void initialize(Translate positionCamera) {
-
-        // Configuration de la caméra
-
-        VBox labelsBox = new VBox(airplanePositionLabel, runwayPositionLabel);
-        labelsBox.setTranslateX(20);
-        labelsBox.setTranslateY(20);
-
-        root.getChildren().addAll(runwayView);
-        SubScene subScene = new SubScene(root, 800, 600, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.LIGHTBLUE);
-        subScene.setCamera(cameraManager.getCamera());
-
-        BorderPane layout = new BorderPane();
-        layout.setTop(controls);  // Place les contrôles dans la partie supérieure
-        layout.setCenter(subScene);  // La subscene au centre
-        layout.setBottom(labelsBox);  // Les labels en bas
-
-        // Marges pour les contrôles
-        BorderPane.setMargin(controls, new Insets(10, 10, 10, 10));
-
-        Group mainRoot = new Group(subScene, labelsBox, indicator, layout);
-        this.scene = new Scene(mainRoot, 800, 600);
+    private SubScene createControlPanel() {
+        controls = new HBox(5);
+        controls.getChildren().addAll(startButton, stopButton, resetButton);
+        controls.setBackground(new Background(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+        controls.setPadding(new Insets(10));
+        controls.setAlignment(Pos.CENTER_LEFT);
+        return new SubScene(controls, 800, 50);
     }
+
+    private SubScene createIndicatorPanel() {
+        VBox indicatorPanel = new VBox(10, airplanePositionLabel, runwayPositionLabel, indicator);
+        indicatorPanel.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(5), Insets.EMPTY)));
+        indicatorPanel.setPadding(new Insets(10));
+        airplanePositionLabel.setTextFill(Color.WHITE);
+        runwayPositionLabel.setTextFill(Color.WHITE);
+        return new SubScene(indicatorPanel, 800, 200);
+    }
+
+
+
+
+
+    private void initialize() {
+        SubScene controlPanelScene = createControlPanel();
+        SubScene cameraViewScene = createCameraView();
+        SubScene indicatorPanelScene = createIndicatorPanel();
+
+        controlPanelScene.setLayoutY(0);
+        cameraViewScene.setLayoutY(controlPanelScene.getHeight());
+        indicatorPanelScene.setLayoutY(600 - indicatorPanelScene.getHeight() + 10);
+
+        root.getChildren().add(controlPanelScene);
+        root.getChildren().add(cameraViewScene);
+        root.getChildren().add(indicatorPanelScene);
+
+        this.scene = new Scene(root, 800, 600, Color.LIGHTBLUE);
+    }
+
+
+
+
 
     public void bindAircraft(Aircraft aircraft) {
         cameraManager.bindToAircraft(aircraft);

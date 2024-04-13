@@ -21,12 +21,10 @@ public class Main extends Application {
         }
 
         Point3DCustom runwayPoint = new Point3DCustom(0, 0, -1250);
-
-        // Créer l'instance de l'avion avec une position initiale et une vitesse
         Aircraft aircraft = new Aircraft(runwayPoint);
-
         MainView mainView = new MainView(aircraft, runwayPoint);
-        SceneController sceneController = new SceneController(mainView, aircraft, mainView.getCameraManager());
+
+        SceneController sceneController = new SceneController(mainView, aircraft);
 
         primaryStage.setScene(mainView.getScene());
         primaryStage.setTitle("Simulateur d'Atterrissage");

@@ -13,15 +13,14 @@ public class SceneController {
     private Service<Void> aircraftSimulationService;
     private Aircraft aircraft;
     private boolean stopSimulation = false;
-    private CameraManager cameraManager;
 
-    public SceneController(MainView mainView, Aircraft aircraft, CameraManager cameraManager) {
+    public SceneController(MainView mainView, Aircraft aircraft) {
         this.mainView = mainView;
-        this.cameraManager = cameraManager;
         this.aircraft = aircraft;
 
         setupAircraftControl();
         startAircraftSimulation();
+        setupControls();
     }
 
     private void setupControls() {
@@ -71,7 +70,7 @@ public class SceneController {
             aircraft.setPitch(aircraft.getPitch() + pitch);
             aircraft.setRoll(aircraft.getRoll() + roll);
 
-            cameraManager.updateOrientation(aircraft.getYaw(), aircraft.getPitch(), aircraft.getRoll());
+            mainView.getCameraManager().updateOrientation(aircraft.getYaw(), aircraft.getPitch(), aircraft.getRoll());
 
             // Mettre à jour l'indicateur ILS après le changement d'orientation
             updateILSIndicator();
