@@ -48,4 +48,8 @@ public class ILS {
         displacement = Math.min(Math.max(displacement, -22.5), 22.5); // -22.5 à 22.5 pixels
         return displacement;
     }
+
+    public double calculateDME(Point3DCustom point) {
+        return glidePath.calculerDMEComplet(point);
+    }
 }

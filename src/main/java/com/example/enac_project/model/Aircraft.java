@@ -14,11 +14,13 @@ public class Aircraft extends Point3DCustom {
     private static final double DEFAULT_Y = -250;
     private static final double DEFAULT_Z = -5000;
     private static final double DEFAULT_SPEED = 30;
+    private Point3DCustom runwayPoint;
 
     public Aircraft(Point3DCustom runwayPoint) {
         super(DEFAULT_X, DEFAULT_Y, DEFAULT_Z);
         ils = new ILS(runwayPoint);
         this.speed.set(DEFAULT_SPEED);
+        this.runwayPoint = runwayPoint;
     }
 
     public double getSpeed() { return speed.get(); }
@@ -55,6 +57,14 @@ public class Aircraft extends Point3DCustom {
 
         // Retourne un nouveau Point3DCustom représentant le vecteur de direction
         return new Point3DCustom(x, y, z);
+    }
+
+    public double calculateAltitudeDifference() {
+        // Obtenez la position Z de la piste depuis l'ILS
+        double runwayZ = runwayPoint.getY();
+
+        // Calculez la différence d'altitude
+        return getY() - runwayZ;
     }
 
     public double getYaw() { return yaw.get(); }

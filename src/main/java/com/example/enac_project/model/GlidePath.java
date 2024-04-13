@@ -9,11 +9,9 @@ public class GlidePath {
 
     public double calculerAngleGP(Point3DCustom positionAvion) {
         // Calculer la distance horizontale et verticale entre l'avion et le seuil de la piste
-        double dx = positionAvion.getX() - seuilPiste.getX();
-        double dy = positionAvion.getY() - seuilPiste.getY();
         double dz = positionAvion.getZ() - seuilPiste.getZ();
 
-        double DME = Math.sqrt(dx * dx + dy * dy); // Distance horizontale
+        double DME = calculerDMEComplet(positionAvion);
         if (DME == 0) {
             return 0;  // Pour éviter la division par zéro
         }
@@ -21,4 +19,14 @@ public class GlidePath {
         double angleRadGP = Math.atan(dz / DME);
         return Math.toDegrees(angleRadGP); // Convertir en degrés
     }
+
+    public double calculerDMEComplet(Point3DCustom positionAvion) {
+        double dx = positionAvion.getX() - seuilPiste.getX();
+        double dy = positionAvion.getY() - seuilPiste.getY();
+        double dz = positionAvion.getZ() - seuilPiste.getZ();  // Inclure la différence en altitude
+
+        // Calcul de la distance euclidienne complète en 3D
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
 }

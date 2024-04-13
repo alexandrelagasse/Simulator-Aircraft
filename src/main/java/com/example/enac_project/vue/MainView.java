@@ -26,16 +26,17 @@ public class MainView {
     private Button stopButton = new Button("Stop");
     private Button resetButton = new Button("Reset");
 
-    private Label airplanePositionLabel = new Label();
-    private Label runwayPositionLabel = new Label();
+    private DMEIndicator DMEApproche;
+    private AltitudeIndicator altitude;
     private HBox controls;
 
     public MainView(Aircraft aircraft, Point3DCustom runwayPoint) {
-        cameraManager = new CameraManager();
+        cameraManager = new CameraManager(aircraft.getX(), aircraft.getY(), aircraft.getZ());
         runwayView = new RunwayView(runwayPoint);
         indicator = new ILSIndicator(new Point3DCustom(200,200, 0));
+        DMEApproche = new DMEIndicator();
+        altitude = new AltitudeIndicator();
 
-        bindAircraft(aircraft);
         initialize();
     }
 
@@ -71,16 +72,17 @@ public class MainView {
     }
 
     private SubScene createIndicatorPanel() {
-        VBox indicatorPanel = new VBox(10, airplanePositionLabel, runwayPositionLabel, indicator);
+        // Création d'un VBox pour contenir les indicateurs
+        VBox indicatorPanel = new VBox(10); // L'espacement entre les éléments est de 10
         indicatorPanel.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(5), Insets.EMPTY)));
         indicatorPanel.setPadding(new Insets(10));
-        airplanePositionLabel.setTextFill(Color.WHITE);
-        runwayPositionLabel.setTextFill(Color.WHITE);
+        indicatorPanel.getChildren().add(indicator);
+
+        indicatorPanel.getChildren().add(DMEApproche.getView());
+        indicatorPanel.getChildren().add(altitude.getView());
+
         return new SubScene(indicatorPanel, 800, 200);
     }
-
-
-
 
 
     private void initialize() {
@@ -100,17 +102,6 @@ public class MainView {
     }
 
 
-
-
-
-    public void bindAircraft(Aircraft aircraft) {
-        cameraManager.bindToAircraft(aircraft);
-
-        airplanePositionLabel.textProperty().bind(Bindings.createStringBinding(() ->
-                        String.format("Avion: X=%.2f Y=%.2f Z=%.2f", aircraft.getX(), aircraft.getY(), aircraft.getZ()),
-                aircraft.xProperty(), aircraft.yProperty(), aircraft.zProperty()));
-    }
-
     public Scene getScene() {
         return this.scene;
     }
@@ -123,5 +114,13 @@ public class MainView {
 
     public void resetCamera() {
         cameraManager.resetCamera();
+    }
+
+    public void setAltitude(double alti) {
+        altitude.updateAltitude(alti);
+    }
+
+    public void setDMEApproche(double dme) {
+        DMEApproche.updateDistance(dme);
     }
 }

@@ -21,6 +21,7 @@ public class SceneController {
         setupAircraftControl();
         startAircraftSimulation();
         setupControls();
+        mainView.getCameraManager().attachToAircraft(aircraft);
     }
 
     private void setupControls() {
@@ -106,10 +107,14 @@ public class SceneController {
         Point3DCustom posAircraft = new Point3DCustom(aircraft.getX(), aircraft.getY(), aircraft.getZ());
         double deviationLocalizer = ils.calculateLocalizerBar(posAircraft);
         double deviationGlidePath = ils.calculateGlidePathBar(posAircraft);
+        double DME = ils.calculateDME(posAircraft);
+        double altitude = aircraft.calculateAltitudeDifference();
 
         ILSIndicator indicator = mainView.getIndicator();
         indicator.adjustGlidePathBars(deviationGlidePath);
         indicator.moveLocalizerBar(deviationLocalizer);
+        mainView.setAltitude(altitude);
+        mainView.setDMEApproche(DME);
 
     }
 

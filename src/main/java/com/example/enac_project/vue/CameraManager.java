@@ -10,11 +10,15 @@ public class CameraManager {
     private final Rotate rotateY;
     private final Rotate rotateZ;
 
-    public CameraManager() {
+    public CameraManager(double x, double y, double z) {
         camera = new PerspectiveCamera(true);
         rotateX = new Rotate(0, Rotate.X_AXIS);
         rotateY = new Rotate(0, Rotate.Y_AXIS);
         rotateZ = new Rotate(0, Rotate.Z_AXIS);
+        camera.setTranslateX(x);
+        camera.setTranslateY(y);
+        camera.setTranslateZ(z);
+
         camera.getTransforms().addAll(rotateX, rotateY, rotateZ);
         camera.setNearClip(1);
         camera.setFarClip(2000);
@@ -25,10 +29,16 @@ public class CameraManager {
         return camera;
     }
 
-    public void bindToAircraft(Aircraft aircraft) {
-        camera.translateXProperty().bind(aircraft.xProperty());
-        camera.translateYProperty().bind(aircraft.yProperty());
-        camera.translateZProperty().bind(aircraft.zProperty());
+    public void attachToAircraft(Aircraft aircraft) {
+        aircraft.xProperty().addListener((observable, oldValue, newValue) -> {
+            camera.setTranslateX(newValue.doubleValue());
+        });
+        aircraft.yProperty().addListener((observable, oldValue, newValue) -> {
+            camera.setTranslateY(newValue.doubleValue());
+        });
+        aircraft.zProperty().addListener((observable, oldValue, newValue) -> {
+            camera.setTranslateZ(newValue.doubleValue());
+        });
     }
 
     public void updateOrientation(double yaw, double pitch, double roll) {
