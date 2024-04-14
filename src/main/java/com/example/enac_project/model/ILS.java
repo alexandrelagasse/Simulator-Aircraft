@@ -6,14 +6,14 @@ public class ILS {
     private Localizer localizer;
     private Markers markers;
 
-    public ILS(Point3DCustom point) {
+    public ILS(RunwayModel point) {
         glidePath = new GlidePath(point);
         localizer = new Localizer(point);
-        double rayonDetection = 500;
+        double rayonDetection = 1000;
         markers = new Markers(
-                new Point3DCustom(0, 0, -8250), // Position de l'OM
-                new Point3DCustom(0, 0, -2250), // Position du MM
-                new Point3DCustom(0, 0, -1350), // Position de l'IM
+                new Point3DCustom(0, 0, 0), // Position de l'OM
+                new Point3DCustom(0, 0, 6000), // Position du MM
+                new Point3DCustom(0, 0, 6900), // Position de l'IM
                 rayonDetection                  // Rayon de détection pour le franchissement
         );
         //markers = new Markers(point);
@@ -44,6 +44,7 @@ public class ILS {
         double degreesPerPixel = 4.5; // 45 pixels pour 10 degrés
 
         double displacement = angleGP * degreesPerPixel;
+        System.out.println("Displacement" + displacement);
         // Limiter le déplacement à la moitié de l'indicateur pour que les barres ne dépassent pas
         displacement = Math.min(Math.max(displacement, -22.5), 22.5); // -22.5 à 22.5 pixels
         return displacement;
