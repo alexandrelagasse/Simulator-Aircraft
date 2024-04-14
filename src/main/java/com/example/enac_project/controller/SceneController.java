@@ -1,22 +1,24 @@
 package com.example.enac_project.controller;
 
+import com.example.enac_project.utils.PapiState;
 import com.example.enac_project.model.*;
-import com.example.enac_project.vue.CameraManager;
-import com.example.enac_project.vue.ILSIndicator;
-import com.example.enac_project.vue.MainView;
+import com.example.enac_project.vue.*;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.scene.PerspectiveCamera;
 
 public class SceneController {
     private MainView mainView;
     private Service<Void> aircraftSimulationService;
     private Aircraft aircraft;
     private boolean stopSimulation = false;
+    private Papi papi;
 
-    public SceneController(MainView mainView, Aircraft aircraft) {
+    public SceneController(MainView mainView, Aircraft aircraft, Papi papi) {
         this.mainView = mainView;
         this.aircraft = aircraft;
+        this.papi = papi;
 
         setupAircraftControl();
         startAircraftSimulation();
@@ -89,6 +91,7 @@ public class SceneController {
                             Platform.runLater(() -> {
                                 aircraft.updatePosition();
                                 updateILSIndicator();
+                                updatePAPIIndicator();
                             });
                             Thread.sleep(100);
                         }
@@ -116,6 +119,19 @@ public class SceneController {
         mainView.setAltitude(altitude);
         mainView.setDMEApproche(DME);
 
+    }
+
+    public void updatePAPIIndicator() {
+        PAPIVue papiVue = mainView.getPAPI();
+        PerspectiveCamera camera = mainView.getCameraManager().getCamera();
+        papi.updatePapiState(camera);
+        papiVue.setIndicatorState(papi.getPapiLevel());
+        PapiStateController PapiController = aircraft.getPapiStateController();
+        PapiController.updateLed();
+        PapiStatusLED papiLED =  mainView.getPAPILED();
+        PapiState state = PapiController.getPapiState();
+
+        papiLED.updateStatus(state);
     }
 
 

@@ -3,7 +3,7 @@ package com.example.enac_project.vue;
 import com.example.enac_project.model.Aircraft;
 import com.example.enac_project.model.Point3DCustom;
 import com.example.enac_project.model.RunwayView;
-import javafx.beans.binding.Bindings;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.*;
@@ -11,7 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Rotate;
-import javafx.scene.control.Label;
+import javafx.scene.transform.Translate;
 
 
 public class MainView {
@@ -22,6 +22,7 @@ public class MainView {
     private CameraManager cameraManager;
     private RunwayView runwayView;
     private ILSIndicator indicator;
+    private PapiStatusLED papiStatusLED;
     private Button startButton = new Button("Start");
     private Button stopButton = new Button("Stop");
     private Button resetButton = new Button("Reset");
@@ -29,6 +30,7 @@ public class MainView {
     private DMEIndicator DMEApproche;
     private AltitudeIndicator altitude;
     private HBox controls;
+    private PAPIVue PAPI;
 
     public MainView(Aircraft aircraft, Point3DCustom runwayPoint) {
         cameraManager = new CameraManager(aircraft.getX(), aircraft.getY(), aircraft.getZ());
@@ -36,6 +38,8 @@ public class MainView {
         indicator = new ILSIndicator(new Point3DCustom(200,200, 0));
         DMEApproche = new DMEIndicator();
         altitude = new AltitudeIndicator();
+        PAPI = new PAPIVue();
+        papiStatusLED = new PapiStatusLED();
 
         initialize();
     }
@@ -56,6 +60,13 @@ public class MainView {
     private SubScene createCameraView() {
         Group cameraViewRoot = new Group();
         cameraViewRoot.getChildren().add(runwayView);
+
+        Group papiView = PAPI.getSpheres();
+        double papiX = runwayView.getBoundsInParent().getMaxX() - 200;
+        double papiY = runwayView.getBoundsInParent().getMinY() ;
+        papiView.getTransforms().add(new Translate(papiX, papiY, 0));
+        cameraViewRoot.getChildren().add(papiView);
+
         SubScene cameraView = new SubScene(cameraViewRoot, 800, 600, true, SceneAntialiasing.BALANCED);
         cameraView.setFill(Color.LIGHTBLUE);
         cameraView.setCamera(cameraManager.getCamera());
@@ -72,14 +83,14 @@ public class MainView {
     }
 
     private SubScene createIndicatorPanel() {
-        // Création d'un VBox pour contenir les indicateurs
-        VBox indicatorPanel = new VBox(10); // L'espacement entre les éléments est de 10
+        VBox indicatorPanel = new VBox(8); // L'espacement entre les éléments est de 10
         indicatorPanel.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(5), Insets.EMPTY)));
         indicatorPanel.setPadding(new Insets(10));
         indicatorPanel.getChildren().add(indicator);
 
         indicatorPanel.getChildren().add(DMEApproche.getView());
         indicatorPanel.getChildren().add(altitude.getView());
+        indicatorPanel.getChildren().add(papiStatusLED);
 
         return new SubScene(indicatorPanel, 800, 200);
     }
@@ -109,6 +120,10 @@ public class MainView {
     public ILSIndicator getIndicator() {return indicator;}
 
     public RunwayView getRunwayView() {return runwayView;}
+
+    public PAPIVue getPAPI(){return PAPI;}
+
+    public PapiStatusLED getPAPILED(){return papiStatusLED;}
 
     public CameraManager getCameraManager() {return cameraManager;}
 

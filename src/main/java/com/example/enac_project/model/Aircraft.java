@@ -15,12 +15,15 @@ public class Aircraft extends Point3DCustom {
     private static final double DEFAULT_Z = -5000;
     private static final double DEFAULT_SPEED = 30;
     private Point3DCustom runwayPoint;
+    private PapiStateController papiStateController;
 
-    public Aircraft(Point3DCustom runwayPoint) {
+
+    public Aircraft(Point3DCustom runwayPoint, Papi papi) {
         super(DEFAULT_X, DEFAULT_Y, DEFAULT_Z);
         ils = new ILS(runwayPoint);
         this.speed.set(DEFAULT_SPEED);
         this.runwayPoint = runwayPoint;
+        papiStateController = new PapiStateController(papi);
     }
 
     public double getSpeed() { return speed.get(); }
@@ -80,7 +83,7 @@ public class Aircraft extends Point3DCustom {
     public DoubleProperty rollProperty() { return roll; }
 
     public ILS getILS () { return ils; }
-
+    public PapiStateController getPapiStateController() {return papiStateController;}
     public void reset() {
 
         setX(DEFAULT_X);
