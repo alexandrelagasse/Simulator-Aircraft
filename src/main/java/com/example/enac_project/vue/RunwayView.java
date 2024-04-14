@@ -1,6 +1,5 @@
 package com.example.enac_project.vue;
 
-import com.example.enac_project.model.Point3DCustom;
 import com.example.enac_project.model.RunwayModel;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
