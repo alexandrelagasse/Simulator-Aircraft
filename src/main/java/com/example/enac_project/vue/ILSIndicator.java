@@ -3,14 +3,14 @@ package com.example.enac_project.vue;
 import com.example.enac_project.model.Point3DCustom;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.Rotate;
 
-
+/**
+ * La classe ILSIndicator représente un indicateur graphique pour le système d'atterrissage aux instruments (ILS).
+ * Elle affiche des éléments tels que des barres de localisation et de glide path, permettant de visualiser l'alignement de l'avion avec la piste.
+ */
 public class ILSIndicator extends Group {
     private static final int AXIS_LENGTH = 90; // Adjust the length as needed
 
@@ -24,6 +24,11 @@ public class ILSIndicator extends Group {
     double offsetForCenteringX = 0.0;
     double offsetForCenteringY = 0.0;
 
+    /**
+     * Constructeur qui initialise l'indicateur ILS avec une position spécifiée.
+     *
+     * @param posHUD La position initiale du HUD où sera placé l'indicateur.
+     */
     public ILSIndicator(Point3DCustom posHUD) {
         initIndicatorBackground(posHUD);
         offsetForCenteringX =  indicatorBackground.getWidth() / 2 + posHUD.getX();
@@ -37,6 +42,7 @@ public class ILSIndicator extends Group {
         this.getChildren().addAll(indicatorBackground, centerCircle, verticalAxis, horizontalAxis,centerDot,  localizerHorizBar, glidePathBar);
     }
 
+    // Méthodes privées pour initialiser les différents éléments graphiques
     private void initIndicatorBackground(Point3DCustom pos) {
         indicatorBackground = new Rectangle(100, 100, Color.DARKGRAY);
         indicatorBackground.setTranslateX(pos.getX());
@@ -105,12 +111,22 @@ public class ILSIndicator extends Group {
         return line;
     }
 
+    /**
+     * Ajuste la position de la barre de glide path en fonction d'une déviation spécifiée.
+     *
+     * @param deviation La déviation à appliquer sur la position verticale de la barre.
+     */
     public void adjustGlidePathBars(double deviation) {
 
         glidePathBar.setTranslateY(offsetForCenteringY - localizerHorizBar.getLayoutBounds().getWidth() / 2 + deviation);
 
     }
 
+    /**
+     * Déplace la barre de localisation horizontalement en fonction de la déviation spécifiée.
+     *
+     * @param deviation La déviation à appliquer sur la position horizontale de la barre.
+     */
     public void moveLocalizerBar(double deviation) {
         // Déplacer le localizer bar horizontalement selon la déviation
         localizerHorizBar.setTranslateX(offsetForCenteringX - glidePathBar.getLayoutBounds().getHeight() / 2 + deviation);
