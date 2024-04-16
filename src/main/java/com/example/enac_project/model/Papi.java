@@ -13,6 +13,8 @@ public class Papi {
     private double angleBeta = 0.55;  // Angle supérieur critique
     private double angleAlpha = 0.15;  // Angle inférieur critique
     private int papiLevel = 0;
+    private GlidePath glidePath;
+    private int planDescenteIdeal = 3;
 
     /**
      * Constructeur qui initialise la position du système PAPI.
@@ -20,8 +22,9 @@ public class Papi {
      *
      * @param papiPosition La position du système PAPI sur la piste.
      */
-    public Papi(Point3DCustom papiPosition) {
+    public Papi(Point3DCustom papiPosition, GlidePath glidepath) {
         this.papiPosition = papiPosition;
+        this.glidePath = glidepath;
     }
 
     /**
@@ -40,41 +43,19 @@ public class Papi {
      *
      * @param camera La caméra représentant la position et l'orientation de l'avion.
      */
-    public void updatePapiState(PerspectiveCamera camera) {
-        double angleGP = calculateAngle(camera);
-        if (angleGP > angleBeta) {
+    public void updatePapiState(Aircraft aircraft) {
+
+        double planDescente = glidePath.calculerAngleGP(new Point3DCustom(aircraft.getX(), aircraft.getY(), aircraft.getZ()));
+        if (planDescente > angleBeta + planDescenteIdeal) {
             papiLevel = 1;
-        } else if (angleGP > angleAlpha) {
+        } else if (planDescente > angleAlpha + planDescenteIdeal) {
             papiLevel = 2;
-        } else if (angleGP > -angleAlpha) {
+        } else if (planDescente > -angleAlpha + planDescenteIdeal) {
             papiLevel = 3;
-        } else if (angleGP > -angleBeta) {
+        } else if (planDescente > -angleBeta + planDescenteIdeal) {
             papiLevel = 4;
         } else {
             papiLevel = 5;
         }
-    }
-
-    /**
-     * Calcule l'angle entre la position de la caméra et la position du PAPI en utilisant les coordonnées locales de la caméra.
-     * Cette méthode aide à déterminer si l'avion est trop haut, trop bas, ou dans l'angle de descente correct.
-     *
-     * @param camera La caméra représentant la position et l'orientation de l'avion.
-     * @return L'angle calculé en degrés.
-     */
-    public double calculateAngle(PerspectiveCamera camera) {
-        Point3DCustom cameraPosition = new Point3DCustom(
-                camera.getLocalToParentTransform().getTx(),
-                camera.getLocalToParentTransform().getTy(),
-                camera.getLocalToParentTransform().getTz()
-        );
-        double dx = papiPosition.getX() - cameraPosition.getX();
-        double dy = papiPosition.getY() - cameraPosition.getY();
-        double dz = papiPosition.getZ() - cameraPosition.getZ();
-
-        Point3DCustom directionVector = new Point3DCustom(dx, dy, dz);
-        Point3DCustom cameraForwardVector = new Point3DCustom(0, 0, -1);
-
-        return Math.toDegrees(Point3DCustom.angleBetween(cameraForwardVector, directionVector));
     }
 }

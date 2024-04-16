@@ -6,7 +6,6 @@ import com.example.enac_project.model.Papi;
 import com.example.enac_project.model.Point3DCustom;
 import com.example.enac_project.model.RunwayModel;
 import com.example.enac_project.vue.MainView;
-import com.example.enac_project.vue.PAPIVue;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
@@ -33,14 +32,11 @@ public class Main extends Application {
         }
 
         // Création du modèle de piste et positionnement des composants associés.
-        RunwayModel runwayPoint = new RunwayModel(0, 250, 7000, 400, 2, 2500);
-        Point3DCustom papiPosition = new Point3DCustom(runwayPoint.getX() + 20, runwayPoint.getY(), runwayPoint.getZ());
-        Papi papi = new Papi(papiPosition);
-        Aircraft aircraft = new Aircraft(runwayPoint, papi);
+        Aircraft aircraft = new Aircraft();
 
         // Initialisation de la vue principale et du contrôleur de scène.
-        MainView mainView = new MainView(aircraft, runwayPoint);
-        SceneController sceneController = new SceneController(mainView, aircraft, papi);
+        MainView mainView = new MainView(aircraft);
+        SceneController sceneController = new SceneController(mainView, aircraft);
 
         // Configuration et affichage de la scène principale.
         primaryStage.setScene(mainView.getScene());

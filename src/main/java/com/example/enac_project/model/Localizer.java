@@ -14,7 +14,7 @@ public class Localizer {
      * @param seuilPiste Le point représentant le seuil initial de la piste avant ajustement.
      */
     public Localizer(RunwayModel seuilPiste) {
-        this.seuilPiste = seuilPiste.getOriginPoint();
+        this.seuilPiste = seuilPiste.getThresholdPoint();
     }
 
     /**
@@ -25,12 +25,22 @@ public class Localizer {
      * @return L'angle de déviation par rapport à l'axe de la piste, en degrés.
      */
     public double calculerAngleLOC(Point3DCustom positionAvion) {
-        // Calculer la déviation horizontale et la distance le long de l'axe de la piste
-        double dx = positionAvion.getX() - seuilPiste.getX();
-        double dz = positionAvion.getZ() - seuilPiste.getZ();
+        double x = positionAvion.getX() - seuilPiste.getX();
+        double z = positionAvion.getZ() - seuilPiste.getZ();
 
-        // Calculer l'angle en radians et le convertir en degrés
-        double angleRadLOC = Math.atan2(dx, dz);
-        return Math.toDegrees(angleRadLOC);
+        double distance = Math.sqrt(x*x + z*z);
+
+        double coteAdjacent = positionAvion.getZ() - seuilPiste.getZ();
+        double signe = 1;
+        if (positionAvion.getX() > seuilPiste.getX()) {
+            signe = -1;
+        }
+
+        System.out.println("Cote adja" + coteAdjacent);
+
+        double angle = Math.abs(Math.acos((coteAdjacent * -1) / distance));
+
+
+        return Math.toDegrees(angle * signe);
     }
 }

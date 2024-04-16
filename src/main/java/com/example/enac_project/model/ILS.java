@@ -5,9 +5,10 @@ public class ILS {
     private GlidePath glidePath;
     private Localizer localizer;
     private Markers markers;
+    private double angleDescente = 3;
 
-    public ILS(RunwayModel point) {
-        glidePath = new GlidePath(point);
+    public ILS(RunwayModel point, GlidePath glidePath) {
+        this.glidePath = glidePath;
         localizer = new Localizer(point);
         double rayonDetection = 1000;
         markers = new Markers(
@@ -29,22 +30,22 @@ public class ILS {
         return markers.franchissementIM(point);
     }
 
-    public double calculateLocalizerBar(Point3DCustom point) {
-        double angleLOC = localizer.calculerAngleLOC(point);
+    public double calculateLocalizerBar(Point3DCustom posAircraft) {
+        double angle = localizer.calculerAngleLOC(posAircraft);
+        System.out.println("angle =" + angle);
         double degreesPerPixel = 4.5; // 45 pixels pour 10 degrés
 
-        double displacement = angleLOC * degreesPerPixel;
+        double displacement = angle * degreesPerPixel;
         // Limiter le déplacement à la moitié de l'indicateur pour que les barres ne dépassent pas
         displacement = Math.min(Math.max(displacement, -22.5), 22.5); // -22.5 à 22.5 pixels
         return displacement;
     }
 
-    public double calculateGlidePathBar(Point3DCustom point) {
-        double angleGP = glidePath.calculerAngleGP(point);
+    public double calculateGlidePathBar(Point3DCustom posAircraft) {
+        double angle = glidePath.calculerAngleGP(posAircraft);
         double degreesPerPixel = 4.5; // 45 pixels pour 10 degrés
 
-        double displacement = angleGP * degreesPerPixel;
-        System.out.println("Displacement" + displacement);
+        double displacement = (angle - angleDescente) * degreesPerPixel;
         // Limiter le déplacement à la moitié de l'indicateur pour que les barres ne dépassent pas
         displacement = Math.min(Math.max(displacement, -22.5), 22.5); // -22.5 à 22.5 pixels
         return displacement;

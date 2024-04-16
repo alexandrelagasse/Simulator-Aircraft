@@ -41,15 +41,14 @@ public class MainView {
      * Constructeur qui initialise la vue principale avec l'avion et le modèle de piste spécifiés.
      *
      * @param aircraft L'avion utilisé dans la simulation.
-     * @param runwayPoint Le modèle de la piste associée à la simulation.
      */
-    public MainView(Aircraft aircraft, RunwayModel runwayPoint) {
+    public MainView(Aircraft aircraft) {
         cameraManager = new CameraManager(aircraft.getX(), aircraft.getY(), aircraft.getZ());
-        runwayView = new RunwayView(runwayPoint);
+        runwayView = new RunwayView(aircraft.getRunwayModel());
         indicator = new ILSIndicator(new Point3DCustom(200,200, 0));
         DMEApproche = new DMEIndicator();
         altitude = new AltitudeIndicator();
-        PAPI = new PAPIVue(runwayPoint);
+        PAPI = new PAPIVue(aircraft.getRunwayModel());
         papiStatusLED = new PapiStatusLED();
         markers = new MarkersIndicator();
 

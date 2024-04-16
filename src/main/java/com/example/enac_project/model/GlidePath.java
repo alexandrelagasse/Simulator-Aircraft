@@ -24,33 +24,25 @@ public class GlidePath {
      * @return L'angle de descente en degrés.
      */
     public double calculerAngleGP(Point3DCustom positionAvion) {
-        // Calculer la distance verticale entre l'avion et le seuil de la piste
-        double dz = positionAvion.getZ() - seuilPiste.getZ();
-        double DME = calculerDMEComplet(positionAvion);
+        double distance = calculerDMEComplet(positionAvion);
+        double hauteur = positionAvion.getY() - seuilPiste.getY();
 
-        // Éviter la division par zéro
-        if (DME == 0) {
-            return 0;
-        }
+        double angle = Math.atan((hauteur * -1) / distance);
 
-        // Calculer l'angle en radians puis convertir en degrés
-        double angleRadGP = Math.atan(dz / DME);
-        return Math.toDegrees(angleRadGP);
+        return Math.toDegrees(angle);
     }
 
     /**
      * Calcule la Distance Measuring Equipment (DME) entre l'avion et le seuil de la piste.
-     * Cette mesure prend en compte toutes les dimensions spatiales (X, Y, Z).
      *
      * @param positionAvion La position actuelle de l'avion.
      * @return La distance totale en mètres.
      */
     public double calculerDMEComplet(Point3DCustom positionAvion) {
-        double dx = positionAvion.getX() - seuilPiste.getX();
-        double dy = positionAvion.getY() - seuilPiste.getY();
-        double dz = positionAvion.getZ() - seuilPiste.getZ();
+        double x = positionAvion.getX() - seuilPiste.getX();
+        double z = positionAvion.getZ() - seuilPiste.getZ();
 
         // Calcul de la distance euclidienne en 3D
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        return Math.sqrt(x * x + z * z);
     }
 }

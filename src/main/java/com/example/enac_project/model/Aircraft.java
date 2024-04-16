@@ -16,22 +16,23 @@ public class Aircraft extends Point3DCustom {
     private DoubleProperty pitch = new SimpleDoubleProperty();   // Tangage (rotation autour de l'axe X)
     private DoubleProperty roll = new SimpleDoubleProperty();    // Roulis (rotation autour de l'axe Z)
     private ILS ils;                                             // Système d'atterrissage aux instruments
+    private Papi papi;
     private static final double DEFAULT_X = 0;                   // Position X par défaut
-    private static final double DEFAULT_Y = 0;                // Position Y par défaut
+    private static final double DEFAULT_Y = -250;                // Position Y par défaut
     private static final double DEFAULT_Z = 0;               // Position Z par défaut
     private static final double DEFAULT_SPEED = 50;              // Vitesse par défaut
-    private RunwayModel runwayPoint;                           // Point de référence de la piste
+    private RunwayModel runwayModel;                           // Point de référence de la piste
 
     /**
      * Constructeur de la classe Aircraft.
-     * @param runwayPoint Le point de la piste qui sert de référence pour certains calculs.
-     * @param papi L'objet Papi associé à cet avion pour la gestion des indicateurs PAPI.
      */
-    public Aircraft(RunwayModel runwayPoint, Papi papi) {
+    public Aircraft() {
         super(DEFAULT_X, DEFAULT_Y, DEFAULT_Z);
-        ils = new ILS(runwayPoint);
+        runwayModel = new RunwayModel(0, 0, 7000, 400, 2, 2500);
+        GlidePath glidePath = new GlidePath(runwayModel);
+        ils = new ILS(runwayModel, glidePath);
+        papi = new Papi(runwayModel, glidePath);
         this.speed.set(DEFAULT_SPEED);
-        this.runwayPoint = runwayPoint;
     }
 
     public double getSpeed() { return speed.get(); }
@@ -61,7 +62,6 @@ public class Aircraft extends Point3DCustom {
 
         // Applique la décélération
         decelerate(0.1);
-        System.out.println("Position: " + getX() + ", " + getY() + ", " + getZ());
     }
 
     /**
@@ -95,7 +95,7 @@ public class Aircraft extends Point3DCustom {
      */
     public double calculateAltitudeDifference() {
         // Obtenez la position Z de la piste depuis l'ILS
-        double runwayZ = runwayPoint.getY();
+        double runwayZ = runwayModel.getY();
 
         // Calculez la différence d'altitude
         return getY() - runwayZ;
@@ -181,5 +181,9 @@ public class Aircraft extends Point3DCustom {
         setYaw(0);
 
     }
+
+    public Papi getPapi() { return papi; }
+
+    public RunwayModel getRunwayModel() { return runwayModel; }
 
 }

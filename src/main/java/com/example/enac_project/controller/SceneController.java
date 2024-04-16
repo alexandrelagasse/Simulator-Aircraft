@@ -24,12 +24,11 @@ public class SceneController {
      *
      * @param mainView La vue principale de l'application.
      * @param aircraft Le modèle de l'avion à simuler.
-     * @param papi Le modèle de PAPI utilisé pour les indicateurs de l'approche.
      */
-    public SceneController(MainView mainView, Aircraft aircraft, Papi papi) {
+    public SceneController(MainView mainView, Aircraft aircraft) {
         this.mainView = mainView;
         this.aircraft = aircraft;
-        this.papi = papi;
+        this.papi = aircraft.getPapi();
 
         setupAircraftControl();
         startAircraftSimulation();
@@ -134,9 +133,8 @@ public class SceneController {
     public void updatePAPIIndicator() {
         PAPIVue papiVue = mainView.getPAPI();
         PerspectiveCamera camera = mainView.getCameraManager().getCamera();
-        System.out.println("camera x: " + camera.getTranslateX() + " y: " + camera.getTranslateY() + " z: " + camera.getTranslateZ());
 
-        papi.updatePapiState(camera);
+        papi.updatePapiState(aircraft);
         papiVue.setIndicatorState(papi.getPapiLevel());
         PapiStatusLED papiLED = mainView.getPAPILED();
 
