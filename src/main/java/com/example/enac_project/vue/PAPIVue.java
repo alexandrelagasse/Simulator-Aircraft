@@ -51,7 +51,7 @@ public class PAPIVue {
         for (int i = 0; i < numSpheres; i++) {
             Sphere sphere = (Sphere) spheresGroup.getChildren().get(i);
             double x = runwayPoint.getX() + (i * spacing);
-            double y = runwayPoint.getY();
+            double y = runwayPoint.getY() - 10;
             double z = runwayPoint.getZ();
             sphere.setTranslateX(x);
             sphere.setTranslateY(y);

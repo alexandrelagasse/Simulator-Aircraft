@@ -35,15 +35,6 @@ public class RunwayModel extends Point3DCustom {
         return new Point3DCustom(getX(), getY(), getZ() - length / 2);
     }
 
-    /**
-     * Obtient le point d'origine de la piste, qui est calculé en ajoutant la longueur de la piste à la position de seuil.
-     *
-     * @return Le point d'origine de la piste, situé à l'opposé du seuil.
-     */
-    public Point3DCustom getOriginPoint() {
-        return new Point3DCustom(getX(), getY(), getZ());
-    }
-
     // Méthodes getter pour les dimensions de la piste
     public double getWidth() { return width; }
     public double getHeight() { return height; }

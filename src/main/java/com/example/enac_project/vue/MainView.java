@@ -3,14 +3,12 @@ package com.example.enac_project.vue;
 import com.example.enac_project.model.Aircraft;
 import com.example.enac_project.model.Point3DCustom;
 
-import com.example.enac_project.model.RunwayModel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
 
@@ -21,8 +19,6 @@ import javafx.scene.transform.Translate;
 public class MainView {
     private Scene scene;
     private final Group root = new Group();
-    private final Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
-    private final Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
     private CameraManager cameraManager;
     private RunwayView runwayView;
     private ILSIndicator indicator;
@@ -43,6 +39,7 @@ public class MainView {
      * @param aircraft L'avion utilisé dans la simulation.
      */
     public MainView(Aircraft aircraft) {
+        root.setFocusTraversable(true);
         cameraManager = new CameraManager(aircraft.getX(), aircraft.getY(), aircraft.getZ());
         runwayView = new RunwayView(aircraft.getRunwayModel());
         indicator = new ILSIndicator(new Point3DCustom(200,200, 0));
@@ -78,7 +75,6 @@ public class MainView {
 
         Group papiView = PAPI.getSpheres();
         double papiX = runwayView.getBoundsInParent().getMaxX() - 200;
-        //double papiZ = runwayView.getBoundsInParent().getMinZ() ;
         papiView.getTransforms().add(new Translate(papiX, 0, -1150));
         cameraViewRoot.getChildren().add(papiView);
 
@@ -148,8 +144,6 @@ public class MainView {
 
     public ILSIndicator getIndicator() {return indicator;}
 
-    public RunwayView getRunwayView() {return runwayView;}
-
     public PAPIVue getPAPI(){return PAPI;}
 
     public PapiStatusLED getPAPILED(){return papiStatusLED;}
@@ -188,6 +182,10 @@ public class MainView {
         if (om) {
             markers.setOM();
         }
+    }
+
+    public Group getRoot() {
+        return root;
     }
 
 }

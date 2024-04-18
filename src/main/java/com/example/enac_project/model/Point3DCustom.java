@@ -91,18 +91,4 @@ public class Point3DCustom {
         double dz = this.getZ() - other.getZ();
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
-
-    /**
-     * Calcule l'angle entre deux points en utilisant le produit scalaire et les magnitudes des vecteurs.
-     *
-     * @param p1 Premier point.
-     * @param p2 Deuxième point.
-     * @return L'angle en radians entre les deux points.
-     */
-    public static double angleBetween(Point3DCustom p1, Point3DCustom p2) {
-        double dotProduct = p1.getX() * p2.getX() + p1.getY() * p2.getY() + p1.getZ() * p2.getZ();
-        double magnitudeP1 = Math.sqrt(p1.getX() * p1.getX() + p1.getY() * p1.getY() + p1.getZ() * p1.getZ());
-        double magnitudeP2 = Math.sqrt(p2.getX() * p2.getX() + p2.getY() * p2.getY() + p2.getZ() * p2.getZ());
-        return Math.acos(dotProduct / (magnitudeP1 * magnitudeP2));
-    }
 }

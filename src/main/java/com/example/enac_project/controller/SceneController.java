@@ -40,10 +40,20 @@ public class SceneController {
      * Configure les boutons de la vue pour contrôler la simulation.
      */
     private void setupControls() {
-        mainView.getStartButton().setOnAction(e -> startAircraftSimulation());
-        mainView.getStopButton().setOnAction(e -> stopSimulation());
-        mainView.getResetButton().setOnAction(e -> resetSimulation());
+        mainView.getStartButton().setOnAction(e -> {
+            startAircraftSimulation();
+            mainView.getRoot().requestFocus(); // Demande le focus après l'action
+        });
+        mainView.getStopButton().setOnAction(e -> {
+            stopSimulation();
+            mainView.getRoot().requestFocus(); // Demande le focus après l'action
+        });
+        mainView.getResetButton().setOnAction(e -> {
+            resetSimulation();
+            mainView.getRoot().requestFocus(); // Demande le focus après l'action
+        });
     }
+
 
     /**
      * Configure les commandes de l'avion liées aux touches du clavier pour piloter l'avion pendant la simulation.

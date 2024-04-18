@@ -28,7 +28,7 @@ public class Aircraft extends Point3DCustom {
      */
     public Aircraft() {
         super(DEFAULT_X, DEFAULT_Y, DEFAULT_Z);
-        runwayModel = new RunwayModel(0, 0, 7000, 400, 2, 2500);
+        runwayModel = new RunwayModel(0, 0, 8250, 400, 2, 2500);
         GlidePath glidePath = new GlidePath(runwayModel);
         ils = new ILS(runwayModel, glidePath);
         papi = new Papi(runwayModel, glidePath);
@@ -37,7 +37,6 @@ public class Aircraft extends Point3DCustom {
 
     public double getSpeed() { return speed.get(); }
     public void setSpeed(double value) { speed.set(value); }
-    public DoubleProperty speedProperty() { return speed; }
 
     /**
      * Ralentit l'avion d'une certaine quantité.
@@ -50,18 +49,54 @@ public class Aircraft extends Point3DCustom {
 
     /**
      * Met à jour la position de l'avion en fonction de sa vitesse et de son orientation.
+     * Calcule le vecteur de direction basé sur l'orientation de l'avion (yaw, pitch, roll)
+     * et ajuste la position en conséquence. Applique également la décélération.
      */
     public void updatePosition() {
         // Calcule le vecteur de direction basé sur l'orientation de l'avion (yaw, pitch, roll)
         Point3DCustom direction = calculateDirectionVector(getYaw(), getPitch(), getRoll());
 
         // Met à jour la position de l'avion en fonction de la direction et de la vitesse
-        setX(getX() + direction.getX() * getSpeed());
-        setY(getY() + direction.getY() * getSpeed());
-        setZ(getZ() + direction.getZ() * getSpeed());
+        double newX = getX() + direction.getX() * getSpeed();
+        double newY = getY() + direction.getY() * getSpeed();
+        double newZ = getZ() + direction.getZ() * getSpeed();
+
+        // Vérifie si l'avion est sur la piste avant de mettre à jour la position
+        if (isOnRunway(newX, newY, newZ, 20)) {
+            setX(newX);
+            setZ(newZ);
+        } else {
+            setX(newX);
+            setY(newY);
+            setZ(newZ);
+        }
 
         // Applique la décélération
         decelerate(0.1);
+    }
+
+    /**
+     * Vérifie si les coordonnées de l'avion se situent sur la piste ou à proximité, incluant l'altitude.
+     * @param x La coordonnée x de l'avion.
+     * @param y La coordonnée y de l'avion.
+     * @param z La coordonnée z de l'avion.
+     * @param lowerAltitudeLimitVar La marge de sécurité en dessous de laquelle l'avion est considéré comme étant sur la piste.
+     * @return true si l'avion est sur la piste ou à proximité, y compris en altitude, sinon false.
+     */
+    private boolean isOnRunway(double x, double y, double z, double lowerAltitudeLimitVar) {
+        // Coordonnées de début et de fin de la piste
+        double runwayStartX = runwayModel.getX() - runwayModel.getWidth() / 2;
+        double runwayEndX = runwayModel.getX() + runwayModel.getWidth() / 2;
+        double runwayStartZ = runwayModel.getZ() - runwayModel.getLength() / 2;
+        double runwayEndZ = runwayModel.getZ() + runwayModel.getLength() / 2;
+
+        // Limite inférieure de l'altitude considérée comme étant sur la piste
+        double lowerAltitudeLimit = runwayModel.getY() - lowerAltitudeLimitVar;
+
+        // Vérifie si les coordonnées de l'avion se trouvent dans les limites de la piste et de l'altitude
+        return (x >= runwayStartX && x <= runwayEndX) &&
+                (z >= runwayStartZ && z <= runwayEndZ) &&
+                (y >= lowerAltitudeLimit);
     }
 
     /**
@@ -98,7 +133,11 @@ public class Aircraft extends Point3DCustom {
         double runwayZ = runwayModel.getY();
 
         // Calculez la différence d'altitude
-        return getY() - runwayZ;
+        double altitude = getY() - runwayZ;
+        if (altitude < 0) {
+            altitude = altitude * -1;  // S'assure que l'altitude affichée est toujours positive.
+        }
+        return altitude;
     }
 
 
@@ -116,12 +155,6 @@ public class Aircraft extends Point3DCustom {
     public void setYaw(double value) { yaw.set(value); }
 
     /**
-     * Propriété JavaFX pour l'angle de lacet, permettant le binding et d'autres interactions.
-     * @return La propriété de lacet.
-     */
-    public DoubleProperty yawProperty() { return yaw; }
-
-    /**
      * Obtient l'angle de tangage actuel de l'avion.
      * Le tangage est l'inclinaison verticale de l'avion, affectant la montée et la descente.
      * @return L'angle de tangage en degrés.
@@ -135,12 +168,6 @@ public class Aircraft extends Point3DCustom {
     public void setPitch(double value) { pitch.set(value); }
 
     /**
-     * Propriété JavaFX pour l'angle de tangage, permettant le binding et d'autres interactions.
-     * @return La propriété de tangage.
-     */
-    public DoubleProperty pitchProperty() { return pitch; }
-
-    /**
      * Obtient l'angle de roulis actuel de l'avion.
      * Le roulis est la rotation autour de l'axe longitudinal de l'avion.
      * @return L'angle de roulis en degrés.
@@ -152,12 +179,6 @@ public class Aircraft extends Point3DCustom {
      * @param value Nouvel angle de roulis en degrés.
      */
     public void setRoll(double value) { roll.set(value); }
-
-    /**
-     * Propriété JavaFX pour l'angle de roulis, permettant le binding et d'autres interactions.
-     * @return La propriété de roulis.
-     */
-    public DoubleProperty rollProperty() { return roll; }
 
     /**
      * Obtient le système d'atterrissage aux instruments (ILS) associé à cet avion.

@@ -1,26 +1,23 @@
 package com.example.enac_project.model;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.PerspectiveCamera;
 
 /**
- * La classe Papi modélise un système PAPI qui aide les pilotes à maintenir le bon angle de descente lors de l'approche d'une piste.
- * Cette classe calcule l'angle de descente de l'avion et ajuste le niveau de PAPI en conséquence.
+ * Représente un système de repérage visuel de descente d'aéronef (PAPI - Precision Approach Path Indicator).
  */
 public class Papi {
-    private Point3DCustom papiPosition;
+    private Point3DCustom papiPosition; // Position du PAPI
     private double angleBeta = 0.55;  // Angle supérieur critique
     private double angleAlpha = 0.15;  // Angle inférieur critique
-    private int papiLevel = 0;
-    private GlidePath glidePath;
-    private int planDescenteIdeal = 3;
+    private int papiLevel = 0; // Niveau du PAPI
+    private GlidePath glidePath; // La trajectoire de descente associée au PAPI
+    private int planDescenteIdeal = 3; // Plan de descente idéal
 
     /**
-     * Constructeur qui initialise la position du système PAPI.
-     * Les angles de référence pour les lumières PAPI sont également initialisés à des valeurs standard.
+     * Construit un objet PAPI avec la position spécifiée et la trajectoire de descente associée.
      *
-     * @param papiPosition La position du système PAPI sur la piste.
+     * @param papiPosition La position du PAPI
+     * @param glidepath    La trajectoire de descente associée au PAPI
      */
     public Papi(Point3DCustom papiPosition, GlidePath glidepath) {
         this.papiPosition = papiPosition;
@@ -28,23 +25,20 @@ public class Papi {
     }
 
     /**
-     * Récupère le niveau actuel de PAPI, qui indique la position de l'avion par rapport à l'angle de descente optimal.
-     * Les valeurs vont de 1 (beaucoup trop bas) à 5 (beaucoup trop haut).
+     * Récupère le niveau actuel du PAPI.
      *
-     * @return Le niveau actuel de PAPI.
+     * @return Le niveau actuel du PAPI
      */
     public int getPapiLevel() {
         return papiLevel;
     }
 
     /**
-     * Met à jour le niveau de PAPI en fonction de l'angle de descente actuel calculé par rapport à la position de la caméra.
-     * Cela permet d'ajuster visuellement les indicateurs pour le pilote.
+     * Met à jour l'état du PAPI en fonction de la position de l'aéronef.
      *
-     * @param camera La caméra représentant la position et l'orientation de l'avion.
+     * @param aircraft L'aéronef pour lequel mettre à jour l'état du PAPI
      */
     public void updatePapiState(Aircraft aircraft) {
-
         double planDescente = glidePath.calculerAngleGP(new Point3DCustom(aircraft.getX(), aircraft.getY(), aircraft.getZ()));
         if (planDescente > angleBeta + planDescenteIdeal) {
             papiLevel = 1;

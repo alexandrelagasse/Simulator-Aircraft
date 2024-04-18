@@ -42,7 +42,6 @@ public class GlidePath {
         double x = positionAvion.getX() - seuilPiste.getX();
         double z = positionAvion.getZ() - seuilPiste.getZ();
 
-        // Calcul de la distance euclidienne en 3D
         return Math.sqrt(x * x + z * z);
     }
 }

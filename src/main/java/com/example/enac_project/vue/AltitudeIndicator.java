@@ -23,9 +23,6 @@ public class AltitudeIndicator {
      * @param altitude L'altitude actuelle à afficher, en mètres.
      */
     public void updateAltitude(double altitude) {
-        if (altitude < 0) {
-            altitude = altitude * -1;  // S'assure que l'altitude affichée est toujours positive.
-        }
         altitudeLabel.setText(String.format("Altitude: %.2f m", altitude));
     }
 

@@ -1,7 +1,9 @@
 package com.example.enac_project.vue;
 
 import com.example.enac_project.model.RunwayModel;
+import javafx.scene.AmbientLight;
 import javafx.scene.Group;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -9,6 +11,8 @@ import javafx.scene.shape.CullFace;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.PointLight;
 import javafx.scene.shape.Sphere;
+
+import java.util.Objects;
 
 /**
  * La classe RunwayView représente la vue de la piste dans un environnement de simulation de vol.
@@ -27,6 +31,7 @@ public class RunwayView extends Group {
         super();
         placerLumiere();
         dessinerPiste(runwayPoint);
+        dessinerTerrain(runwayPoint);
     }
 
     /**
@@ -35,15 +40,44 @@ public class RunwayView extends Group {
      * @param runwayPoint Le modèle de piste fournissant les spécifications nécessaires.
      */
     private void dessinerPiste(RunwayModel runwayPoint) {
+        Image texture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/images.jfif")));
+        PhongMaterial material = new PhongMaterial();
+        material.setDiffuseMap(texture);
+
         piste = new Box(runwayPoint.getWidth(), runwayPoint.getHeight(), runwayPoint.getLength());
         piste.setTranslateX(runwayPoint.getX());
         piste.setTranslateY(runwayPoint.getY());
         piste.setTranslateZ(runwayPoint.getZ());
         piste.setCullFace(CullFace.BACK);
         piste.setDrawMode(DrawMode.FILL);
-        piste.setMaterial(new PhongMaterial(Color.BLUE));
+        piste.setMaterial(material);
         this.getChildren().add(piste);
     }
+
+    /**
+     * Dessine un terrain autour de la piste pour simuler un environnement.
+     * @param runwayPoint Le modèle de la piste autour de laquelle le terrain sera dessiné.
+     */
+    private void dessinerTerrain(RunwayModel runwayPoint) {
+        // Charger la texture d'herbe
+        Image grassTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/herbe.jpg")));
+        PhongMaterial grassMaterial = new PhongMaterial();
+        grassMaterial.setDiffuseMap(grassTexture);
+
+        // Créer un terrain plus grand que la piste
+        double margin = 1000; // La marge autour de la piste, à ajuster selon besoin
+        Box terrain = new Box(runwayPoint.getWidth() + margin, runwayPoint.getHeight(), runwayPoint.getLength() + margin);
+        terrain.setTranslateX(runwayPoint.getX());
+        terrain.setTranslateY(runwayPoint.getY() + 1); // Positionner en dessous de la piste avec +1 en Y
+        terrain.setTranslateZ(runwayPoint.getZ());
+        terrain.setCullFace(CullFace.BACK);
+        terrain.setDrawMode(DrawMode.FILL);
+        terrain.setMaterial(grassMaterial);
+
+        // Ajouter le terrain à la scène, en dessous de la piste
+        this.getChildren().addFirst(terrain); // Ajouter en premier pour qu'il soit en dessous de la piste
+    }
+
 
     /**
      * Place une source de lumière dans la scène pour éclairer la piste.
@@ -54,6 +88,10 @@ public class RunwayView extends Group {
         pointLight.setTranslateY(-800);
         pointLight.setTranslateZ(-20);
         this.getChildren().addAll(pointLight);
+
+        // Ajout d'éclairage ambiant pour éviter les zones trop sombres
+        AmbientLight ambient = new AmbientLight(Color.rgb(50, 50, 50));
+        this.getChildren().add(ambient);
     }
 
     /**
