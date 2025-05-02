@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch JavaFX App",
+      "request": "launch",
+      "mainClass": "com.example.enac_project.Main",
+      "vmArgs": "--module-path \"${workspaceFolder}/lib;${workspaceFolder}/out\" --add-modules javafx.controls,javafx.fxml",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
