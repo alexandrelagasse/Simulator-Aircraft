@@ -1,7 +1,0 @@
-{
-  "java.project.sourcePaths": ["src"],
-  "java.project.referencedLibraries": [
-    "C:/Users/lagas/Desktop/delivery/enac/lib/*.jar"
-  ],
-  "java.project.outputPath": "out"
-}
