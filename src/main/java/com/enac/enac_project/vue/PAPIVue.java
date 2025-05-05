@@ -1,93 +1,116 @@
 package com.enac.enac_project.vue;
 
-import com.enac.enac_project.model.Point3DCustom;
+import com.enac.enac_project.model.RunwayModel;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Sphere;
+import javafx.scene.shape.Box;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
+import javafx.scene.PointLight;
+import javafx.scene.image.Image;
+import java.util.Objects;
+import java.util.List;
+import java.util.Arrays;
 
 /**
- * La classe PAPIVue gère la visualisation des lumières PAPI, qui sont des indicateurs de l'angle d'approche de la piste.
- * Chaque lumière peut être allumée en rouge ou blanche pour simuler l'indication visuelle du système PAPI.
+ * The PAPIVue class represents the visual display of the Precision Approach Path Indicator (PAPI)
+ * in a 3D environment.
  */
-public class PAPIVue {
-    private Group spheresGroup = new Group(); // Groupe contenant les sphères représentant les lumières PAPI
-    private final int numSpheres = 4; // Nombre de sphères/lumières PAPI
-    private Point3DCustom runwayPoint; // Point de référence sur la piste pour le placement des sphères
+public class PAPIVue extends Group {
+    private static final double LIGHT_SPACING = 20;
+    private static final double LIGHT_HEIGHT = 2;
+    private static final double LIGHT_RADIUS = 1;
+    
+    private Cylinder[] lights;
+    private PointLight[] lightSources;
+    private Group lightsGroup;
 
-    /**
-     * Constructeur qui initialise la vue PAPI avec un point de référence sur la piste.
-     *
-     * @param runwayPoint Le point sur la piste où les lumières PAPI doivent être positionnées.
-     */
-    public PAPIVue(Point3DCustom runwayPoint) {
-        this.runwayPoint = runwayPoint;
-        createSpheres();
-        placeSphereAtRunwayPoint();
+    public PAPIVue(RunwayModel runwayModel) {
+        super();
+        lightsGroup = new Group();
+        createPAPILights();
     }
 
-    /**
-     * Crée les sphères qui représentent les lumières PAPI et les ajoute au groupe de sphères.
-     */
-    private void createSpheres() {
-        double spacing = 20; // Espacement entre chaque sphère
-        for (int i = 0; i < numSpheres; i++) {
-            Sphere sphere = new Sphere(10);
-            PhongMaterial material = new PhongMaterial();
-            material.setDiffuseColor(Color.WHITE); // Couleur initiale des sphères
-            material.setSpecularColor(Color.BLUE); // Couleur spéculaire pour un effet visuel
-            sphere.setMaterial(material);
-            sphere.setTranslateX(i * spacing);
-            spheresGroup.getChildren().add(sphere);
+    private void createPAPILights() {
+        lights = new Cylinder[4];
+        lightSources = new PointLight[4];
+        
+        for (int i = 0; i < 4; i++) {
+            Cylinder light = new Cylinder(LIGHT_RADIUS, LIGHT_HEIGHT);
+            PhongMaterial material = new PhongMaterial(Color.WHITE);
+            material.setSpecularColor(Color.WHITE.brighter());
+            material.setSpecularPower(100);
+            light.setMaterial(material);
+            light.setTranslateX(i * LIGHT_SPACING - 30);
+            light.setTranslateY(0);
+            light.setTranslateZ(0);
+            light.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+            
+            PointLight pointLight = new PointLight(Color.WHITE);
+            pointLight.setTranslateX(i * LIGHT_SPACING - 30);
+            pointLight.setTranslateY(0);
+            pointLight.setTranslateZ(0);
+            
+            lights[i] = light;
+            lightSources[i] = pointLight;
+            
+            lightsGroup.getChildren().addAll(light, pointLight);
+        }
+        this.getChildren().add(lightsGroup);
+    }
+
+    public void setIndicatorState(int level) {
+        // Reset all lights to white
+        for (int i = 0; i < 4; i++) {
+            lights[i].setMaterial(new PhongMaterial(Color.WHITE));
+            lightSources[i].setColor(Color.WHITE);
+        }
+
+        // Set appropriate colors based on PAPI level
+        switch (level) {
+            case 1: // Too high
+                for (int i = 0; i < 4; i++) {
+                    lights[i].setMaterial(new PhongMaterial(Color.RED));
+                    lightSources[i].setColor(Color.RED);
+                }
+                break;
+            case 2: // Slightly high
+                for (int i = 0; i < 3; i++) {
+                    lights[i].setMaterial(new PhongMaterial(Color.RED));
+                    lightSources[i].setColor(Color.RED);
+                }
+                lights[3].setMaterial(new PhongMaterial(Color.WHITE));
+                lightSources[3].setColor(Color.WHITE);
+                break;
+            case 3: // On glide path
+                for (int i = 0; i < 2; i++) {
+                    lights[i].setMaterial(new PhongMaterial(Color.RED));
+                    lightSources[i].setColor(Color.RED);
+                }
+                for (int i = 2; i < 4; i++) {
+                    lights[i].setMaterial(new PhongMaterial(Color.WHITE));
+                    lightSources[i].setColor(Color.WHITE);
+                }
+                break;
+            case 4: // Slightly low
+                lights[0].setMaterial(new PhongMaterial(Color.RED));
+                lightSources[0].setColor(Color.RED);
+                for (int i = 1; i < 4; i++) {
+                    lights[i].setMaterial(new PhongMaterial(Color.WHITE));
+                    lightSources[i].setColor(Color.WHITE);
+                }
+                break;
+            case 5: // Too low
+                for (int i = 0; i < 4; i++) {
+                    lights[i].setMaterial(new PhongMaterial(Color.WHITE));
+                    lightSources[i].setColor(Color.WHITE);
+                }
+                break;
         }
     }
 
-    /**
-     * Place les sphères au point de référence du runway avec l'espacement approprié.
-     */
-    private void placeSphereAtRunwayPoint() {
-        double spacing = 20; // Espacement entre les sphères
-        for (int i = 0; i < numSpheres; i++) {
-            Sphere sphere = (Sphere) spheresGroup.getChildren().get(i);
-            double x = runwayPoint.getX() + (i * spacing);
-            double y = runwayPoint.getY() - 10;
-            double z = runwayPoint.getZ();
-            sphere.setTranslateX(x);
-            sphere.setTranslateY(y);
-            sphere.setTranslateZ(z);
-            Rotate rotate = new Rotate(0, Rotate.Y_AXIS); // Rotation autour de l'axe Y si nécessaire
-            sphere.getTransforms().add(rotate);
-        }
-    }
-
-    /**
-     * Met à jour l'état des lumières PAPI en fonction du nombre spécifié de lumières allumées en rouge.
-     *
-     * @param numLit Le nombre de lumières à allumer en rouge.
-     */
-    public void setIndicatorState(int numLit) {
-        if (numLit < 1 || numLit > numSpheres) {
-            return; // Vérifie que le nombre est dans la plage valide
-        }
-        numLit = numLit - 1; // Ajustement pour l'indexation de tableau
-        for (int i = 0; i < numSpheres; i++) {
-            Sphere sphere = (Sphere) spheresGroup.getChildren().get(i);
-            if (i < numLit) {
-                ((PhongMaterial) sphere.getMaterial()).setDiffuseColor(Color.RED);
-            } else {
-                ((PhongMaterial) sphere.getMaterial()).setDiffuseColor(Color.WHITE);
-                ((PhongMaterial) sphere.getMaterial()).setSpecularColor(Color.BLUE);
-            }
-        }
-    }
-
-    /**
-     * Renvoie le groupe de sphères représentant les lumières PAPI.
-     *
-     * @return Le groupe de sphères.
-     */
     public Group getSpheres() {
-        return spheresGroup;
+        return lightsGroup;
     }
 }

@@ -1,91 +1,117 @@
 package com.enac.enac_project.vue;
 
-import javafx.scene.shape.Circle;
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Cylinder;
+import javafx.scene.shape.Sphere;
+import javafx.scene.transform.Rotate;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+import javafx.scene.PointLight;
+import javafx.scene.image.Image;
+import java.util.Objects;
 
 /**
- * La classe MarkersIndicator gère les indicateurs visuels pour les trois types de marqueurs utilisés dans la navigation aérienne :
- * OM (Outer Marker), MM (Middle Marker) et IM (Inner Marker).
- * Chaque marqueur est représenté par un cercle coloré, initialisé en rouge et pouvant être mis à jour en vert.
+ * The MarkersIndicator class represents the visual indicators for approach markers (OM, MM, IM)
+ * in a 3D environment.
  */
-public class MarkersIndicator {
+public class MarkersIndicator extends Group {
+    private Sphere outerMarker;
+    private Sphere middleMarker;
+    private Sphere innerMarker;
+    private Timeline markerAnimation;
 
-    private Circle om;  // Cercle représentant l'Outer Marker
-    private Circle mm;  // Cercle représentant le Middle Marker
-    private Circle im;  // Cercle représentant l'Inner Marker
-
-    /**
-     * Constructeur qui initialise les trois cercles avec une couleur rouge par défaut.
-     */
     public MarkersIndicator() {
-        om = new Circle(10, Color.RED); // OM setup avec couleur rouge
-        mm = new Circle(10, Color.RED); // MM setup avec couleur rouge
-        im = new Circle(10, Color.RED); // IM setup avec couleur rouge
+        super();
+        createMarkers();
+        setupAnimation();
     }
 
-    /**
-     * Obtient le cercle représentant le Outer Marker (OM).
-     * @return Le cercle représentant le OM.
-     */
-    public Circle getOM() {
-        return om;
+    private void createMarkers() {
+        // Outer Marker (OM)
+        outerMarker = createMarker(0, -250, 0, Color.BLUE);
+        
+        // Middle Marker (MM)
+        middleMarker = createMarker(0, -250, 6000, Color.YELLOW);
+        
+        // Inner Marker (IM)
+        innerMarker = createMarker(0, -250, 6900, Color.WHITE);
     }
 
-    /**
-     * Obtient le cercle représentant le Middle Marker (MM).
-     * @return Le cercle représentant le MM.
-     */
-    public Circle getMM() {
-        return mm;
+    private Sphere createMarker(double x, double y, double z, Color color) {
+        Sphere marker = new Sphere(10);
+        PhongMaterial material = new PhongMaterial(color);
+        material.setSpecularColor(color.brighter());
+        material.setSpecularPower(100);
+        marker.setMaterial(material);
+        marker.setTranslateX(x);
+        marker.setTranslateY(y);
+        marker.setTranslateZ(z);
+
+        PointLight light = new PointLight(color);
+        light.setTranslateX(x);
+        light.setTranslateY(y);
+        light.setTranslateZ(z);
+        this.getChildren().add(light);
+
+        this.getChildren().add(marker);
+        return marker;
     }
 
-    /**
-     * Obtient le cercle représentant le Inner Marker (IM).
-     * @return Le cercle représentant le IM.
-     */
-    public Circle getIM() {
-        return im;
+    private void setupAnimation() {
+        markerAnimation = new Timeline(
+            new KeyFrame(Duration.seconds(0.5), e -> {
+                outerMarker.setVisible(!outerMarker.isVisible());
+                middleMarker.setVisible(!middleMarker.isVisible());
+                innerMarker.setVisible(!innerMarker.isVisible());
+            })
+        );
+        markerAnimation.setCycleCount(Animation.INDEFINITE);
+        markerAnimation.play();
     }
 
-    /**
-     * Met à jour la couleur du cercle représentant le Outer Marker (OM) en vert pour indiquer son activation.
-     */
-    public void setOM() {
-        om.setFill(Color.GREEN);
+    public Sphere getOM() {
+        return outerMarker;
     }
 
-    /**
-     * Met à jour la couleur du cercle représentant le Middle Marker (MM) en vert pour indiquer son activation.
-     */
-    public void setMM() {
-        mm.setFill(Color.GREEN);
+    public Sphere getMM() {
+        return middleMarker;
     }
 
-    /**
-     * Met à jour la couleur du cercle représentant le Inner Marker (IM) en vert pour indiquer son activation.
-     */
-    public void setIM() {
-        im.setFill(Color.GREEN);
+    public Sphere getIM() {
+        return innerMarker;
     }
 
-    /**
-     * Réinitialise la couleur du cercle représentant le Outer Marker (OM) en rouge pour indiquer sa désactivation.
-     */
     public void resetOM() {
-        om.setFill(Color.RED);
+        outerMarker.setVisible(false);
     }
 
-    /**
-     * Réinitialise la couleur du cercle représentant le Middle Marker (MM) en rouge pour indiquer sa désactivation.
-     */
     public void resetMM() {
-        mm.setFill(Color.RED);
+        middleMarker.setVisible(false);
     }
 
-    /**
-     * Réinitialise la couleur du cercle représentant le Inner Marker (IM) en rouge pour indiquer sa désactivation.
-     */
     public void resetIM() {
-        im.setFill(Color.RED);
+        innerMarker.setVisible(false);
+    }
+
+    public void setOM(boolean visible) {
+        outerMarker.setVisible(visible);
+    }
+
+    public void setMM(boolean visible) {
+        middleMarker.setVisible(visible);
+    }
+
+    public void setIM(boolean visible) {
+        innerMarker.setVisible(visible);
+    }
+
+    public void stopAnimation() {
+        if (markerAnimation != null) {
+            markerAnimation.stop();
+        }
     }
 }

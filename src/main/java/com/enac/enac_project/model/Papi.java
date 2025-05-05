@@ -3,21 +3,21 @@ package com.enac.enac_project.model;
 import javafx.scene.PerspectiveCamera;
 
 /**
- * Représente un système de repérage visuel de descente d'aéronef (PAPI - Precision Approach Path Indicator).
+ * Represents a Precision Approach Path Indicator (PAPI) system for aircraft descent guidance.
  */
 public class Papi {
-    private Point3DCustom papiPosition; // Position du PAPI
-    private double angleBeta = 0.55;  // Angle supérieur critique
-    private double angleAlpha = 0.15;  // Angle inférieur critique
-    private int papiLevel = 0; // Niveau du PAPI
-    private GlidePath glidePath; // La trajectoire de descente associée au PAPI
-    private int planDescenteIdeal = 3; // Plan de descente idéal
+    private Point3DCustom papiPosition; // PAPI position
+    private double angleBeta = 0.55;  // Upper critical angle
+    private double angleAlpha = 0.15;  // Lower critical angle
+    private int papiLevel = 0; // PAPI level
+    private GlidePath glidePath; // Associated glide path
+    private int idealDescentAngle = 3; // Ideal descent angle
 
     /**
-     * Construit un objet PAPI avec la position spécifiée et la trajectoire de descente associée.
+     * Constructs a PAPI object with the specified position and associated glide path.
      *
-     * @param papiPosition La position du PAPI
-     * @param glidepath    La trajectoire de descente associée au PAPI
+     * @param papiPosition The PAPI position
+     * @param glidepath    The associated glide path
      */
     public Papi(Point3DCustom papiPosition, GlidePath glidepath) {
         this.papiPosition = papiPosition;
@@ -25,28 +25,28 @@ public class Papi {
     }
 
     /**
-     * Récupère le niveau actuel du PAPI.
+     * Gets the current PAPI level.
      *
-     * @return Le niveau actuel du PAPI
+     * @return The current PAPI level
      */
     public int getPapiLevel() {
         return papiLevel;
     }
 
     /**
-     * Met à jour l'état du PAPI en fonction de la position de l'aéronef.
+     * Updates the PAPI state based on the aircraft position.
      *
-     * @param aircraft L'aéronef pour lequel mettre à jour l'état du PAPI
+     * @param aircraft The aircraft for which to update the PAPI state
      */
     public void updatePapiState(Aircraft aircraft) {
-        double planDescente = glidePath.calculerAngleGP(new Point3DCustom(aircraft.getX(), aircraft.getY(), aircraft.getZ()));
-        if (planDescente > angleBeta + planDescenteIdeal) {
+        double descentAngle = glidePath.calculateGlideSlopeAngle(new Point3DCustom(aircraft.getX(), aircraft.getY(), aircraft.getZ()));
+        if (descentAngle > angleBeta + idealDescentAngle) {
             papiLevel = 1;
-        } else if (planDescente > angleAlpha + planDescenteIdeal) {
+        } else if (descentAngle > angleAlpha + idealDescentAngle) {
             papiLevel = 2;
-        } else if (planDescente > -angleAlpha + planDescenteIdeal) {
+        } else if (descentAngle > -angleAlpha + idealDescentAngle) {
             papiLevel = 3;
-        } else if (planDescente > -angleBeta + planDescenteIdeal) {
+        } else if (descentAngle > -angleBeta + idealDescentAngle) {
             papiLevel = 4;
         } else {
             papiLevel = 5;

@@ -167,21 +167,15 @@ public class MainView {
     }
 
     public void setMarkersMM(boolean mm) {
-        if (mm) {
-            markers.setMM();
-        }
+        markers.setMM(mm);
     }
 
     public void setMarkersIM(boolean im) {
-        if (im) {
-            markers.setIM();
-        }
+        markers.setIM(im);
     }
 
     public void setMarkersOM(boolean om) {
-        if (om) {
-            markers.setOM();
-        }
+        markers.setOM(om);
     }
 
     public Group getRoot() {

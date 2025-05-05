@@ -123,9 +123,9 @@ public class SceneController {
         double deviationGlidePath = ils.calculateGlidePathBar(posAircraft);
         double DME = ils.calculateDME(posAircraft);
         double altitude = aircraft.calculateAltitudeDifference();
-        boolean om = ils.franchissementMarkersOM(posAircraft);
-        boolean im = ils.franchissementMarkersIM(posAircraft);
-        boolean mm = ils.franchissementMarkersMM(posAircraft);
+        boolean om = ils.hasPassedOuterMarker(posAircraft);
+        boolean im = ils.hasPassedInnerMarker(posAircraft);
+        boolean mm = ils.hasPassedMiddleMarker(posAircraft);
 
         ILSIndicator indicator = mainView.getIndicator();
         indicator.adjustGlidePathBars(deviationGlidePath);

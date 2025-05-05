@@ -10,49 +10,64 @@ import javafx.application.Application;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * La classe Main est le point d'entrée de l'application de simulation de vol.
- * Elle initialise et lance l'interface utilisateur en utilisant JavaFX, en vérifiant la prise en charge des fonctionnalités 3D.
+ * The Main class is the entry point of the flight simulation application.
+ * It initializes and launches the user interface using JavaFX, checking for 3D feature support.
  */
 public class Main extends Application {
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     /**
-     * Démarrage de l'application JavaFX. Cette méthode configure et affiche la fenêtre principale de l'application.
+     * Starts the JavaFX application. This method configures and displays the main application window.
      *
-     * @param primaryStage Le stage principal fourni par JavaFX.
+     * @param primaryStage The primary stage provided by JavaFX.
      */
     @Override
     public void start(Stage primaryStage) {
-        // Vérifie si les fonctionnalités 3D sont supportées sur cette plateforme.
-        boolean is3DSupported = Platform.isSupported(ConditionalFeature.SCENE3D);
-        if (!is3DSupported) {
-            System.out.println("Sorry, 3D is not supported in JavaFX on this platform.");
-            return;
+        try {
+            // Check if 3D features are supported on this platform
+            boolean is3DSupported = Platform.isSupported(ConditionalFeature.SCENE3D);
+            if (!is3DSupported) {
+                logger.error("3D is not supported in JavaFX on this platform");
+                System.exit(1);
+            }
+
+            // Create aircraft model
+            Aircraft aircraft = new Aircraft();
+
+            // Initialize main view and scene controller
+            MainView mainView = new MainView(aircraft);
+            SceneController sceneController = new SceneController(mainView, aircraft);
+
+            // Configure and display the main scene
+            primaryStage.setScene(mainView.getScene());
+            primaryStage.setTitle("Landing Simulator");
+            primaryStage.show();
+
+            // Request focus for user input handling
+            mainView.getScene().getRoot().requestFocus();
+            
+            logger.info("Application started successfully");
+        } catch (Exception e) {
+            logger.error("Failed to start application", e);
+            System.exit(1);
         }
-
-        // Création du modèle de piste et positionnement des composants associés.
-        Aircraft aircraft = new Aircraft();
-
-        // Initialisation de la vue principale et du contrôleur de scène.
-        MainView mainView = new MainView(aircraft);
-        SceneController sceneController = new SceneController(mainView, aircraft);
-
-        // Configuration et affichage de la scène principale.
-        primaryStage.setScene(mainView.getScene());
-        primaryStage.setTitle("Simulateur d'Atterrissage");
-        primaryStage.show();
-
-        // Demande de focus pour permettre la gestion des entrées utilisateur.
-        mainView.getScene().getRoot().requestFocus();
     }
 
     /**
-     * Méthode principale pour lancer l'application.
+     * Main method to launch the application.
      *
-     * @param args Arguments de ligne de commande.
+     * @param args Command line arguments.
      */
     public static void main(String[] args) {
-        launch(args);
+        try {
+            launch(args);
+        } catch (Exception e) {
+            logger.error("Application failed to launch", e);
+            System.exit(1);
+        }
     }
 }
